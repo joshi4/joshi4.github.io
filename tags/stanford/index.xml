@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Stanford on Shantanu Joshi</title>
+    <link>http://joshi4.github.io/tags/stanford/</link>
+    <description>Recent content in Stanford on Shantanu Joshi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
+    <lastBuildDate>Thu, 02 Apr 2015 00:33:10 -0700</lastBuildDate>
+    <atom:link href="http://joshi4.github.io/tags/stanford/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Eraser: Data Race Detector</title>
+      <link>http://joshi4.github.io/post/eraser/</link>
+      <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
+      
+      <guid>http://joshi4.github.io/post/eraser/</guid>
+      <description>
+
+&lt;p&gt;Today, we discussed &lt;a href=&#34;http://cseweb.ucsd.edu/~savage/papers/Tocs97.pdf&#34;&gt;Eraser&lt;/a&gt;. It is essentially a tool to find data races in programs dynamically, i:e no static compile time checking.&lt;/p&gt;
+
+&lt;p&gt;During the time this paper was published, the big focus was on performance and not debugging. Thus, there was no competition in this areas and its utility is apparent even though it results in performance that is 10 to 30 times slower.&lt;/p&gt;
+
+&lt;p&gt;First, they talk about Leslie Lamport&amp;rsquo;s &lt;code&gt;Happens-before&lt;/code&gt; partial order which can be used to identify data races in some cases, but depends on the the scheduler and even then can miss detecting data races. An example of a data-race that will be missed is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;Thread 1:           Thread 2: 
+
+y += 1                lock(m)
+lock (m)              x++
+x++                   unlock (m) 
+unlock (m)            y += 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Clearly, there is a data race on y here but with the happens-before partial order, if &lt;code&gt;Thread 1&lt;/code&gt; runs before Thread 2 then it does not detect the data race. A key advantage of &lt;code&gt;Eraser&lt;/code&gt; is that it is independent of the scheduler in findings bugs. The key to getting good results from Eraser is having good test coverage.&lt;/p&gt;
+
+&lt;p&gt;At a high level, their main algorithm is as follows:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;For every shared variable, have a candidate set.&lt;/li&gt;
+&lt;li&gt;When a shared variable in initialized, it&amp;rsquo;s candidate set is the set of all locks&lt;/li&gt;
+&lt;li&gt;On a read/write from another read, the candidate set is updated as: &lt;code&gt;CS /\= lockset (curr_thread)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;If it turns out that &lt;code&gt;CS = {}&lt;/code&gt; then we have detected a data race. Since set intersection is commutative, the interleaving of threads does not matter.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To do this, &lt;code&gt;Eraser&lt;/code&gt; instruments every load/store resulting in the performance hit mentioned before. The algorithm as mentioned above needs to be extended to work for many other common cases like Shared-Reader-Writer Locks, Read-Shared Data and Initialization.&lt;/p&gt;
+
+&lt;p&gt;Shared variables are frequently initialized without holding any locks, as during this time, no other thread can hold a reference to this variable. To avoid false-alarms, a variables candidate set is refined only after it is initialized.&lt;/p&gt;
+
+&lt;p&gt;Further, simulataneous reads to a shared variable are not data races. As long as this is the case, Eraser will not report any errors.&lt;/p&gt;
+
+&lt;p&gt;These different cases are neatly accomodated into a single state-machine represented by Figure 4 in the paper.&lt;/p&gt;
+
+&lt;h2 id=&#34;experiments:342ad35872a16e059735c2e8cd40583b&#34;&gt;Experiments&lt;/h2&gt;
+
+&lt;p&gt;One of the things, I really liked about this paper is the effort they put in to conduct various studies. The authors use their tool on various production grade projects and see if they can find any bugs. While, they find some bugs, they also ran into issues regarding, intentional data-races for performance reasons, private implementations of malloc/free and locks. All of this led to many false positives. To fix this, they introduced &lt;code&gt;annotations&lt;/code&gt; which can help suppress various categories of bugs that &lt;code&gt;Eraser&lt;/code&gt; would report.&lt;/p&gt;
+
+&lt;p&gt;A limitation of the tool is that it works only on locks and not other synchronization primitives like semaphores, which means it only has limited utility in finding bugs in kernel code.&lt;/p&gt;
+
+&lt;p&gt;Lastly, they also used their tool to find bugs on undergraduate students&amp;rsquo; homework assignments and as expected find more bugs than in the mature production code.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Worse is Better</title>
+      <link>http://joshi4.github.io/post/worse_better/</link>
+      <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
+      
+      <guid>http://joshi4.github.io/post/worse_better/</guid>
+      <description>&lt;p&gt;I dropped into the CS240 lecture at Stanford this week and they were discussing &lt;a href=&#34;https://www.dreamsongs.com/RiseOfWorseIsBetter.html&#34;&gt;The Rise of Worse is Better&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It is a  very short paper and infact not very technical at all barring one example.&lt;/p&gt;
+
+&lt;p&gt;The main point the author, Richard Gabriel tries to make is that simplicity wins over correctness, completeness and consistency which was contrary to what many people at MIT believed at the time. He talks of C and Unix being viruses which survived because they were easy to acquire.&lt;/p&gt;
+
+&lt;p&gt;Examples of this include: the fork/exec model in *nix as opposed to windows and the PC-loser-ing problem mentioned in the paper.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

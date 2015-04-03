@@ -1,0 +1,218 @@
+<html lang="en">
+<head>
+
+  
+  <meta charset="utf-8">
+  <title>Crypto Learnings</title>
+  <meta name="description" content="Crypto Learnings">
+  <meta name="author" content="Shantanu Joshi">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="http://joshi4.github.io//css/fonts.css">
+  <link rel="stylesheet" href="http://joshi4.github.io//css/normalize.css">
+  <link rel="stylesheet" href="http://joshi4.github.io//css/skeleton.css">
+  <link rel="stylesheet" href="http://joshi4.github.io//css/custom.css">
+
+  
+  
+  <link rel="stylesheet" href="http://joshi4.github.io//highlight/styles/default.css">
+  
+  <script src="http://joshi4.github.io//highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+<body>
+
+<header id="menu">
+  <div class="container">
+	<span class="logo">Shantanu Joshi</span>
+	<a>&#9776;</a>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="container">
+	<div class="row">
+	  <div class="eight columns offset-by-two">
+		<ul class="">
+		  
+		  <li class="u-pull-left"> <a href="http://joshi4.github.io/" class="brand" style="font-weight:bold;font-size:normal"> Shantanu Joshi </a></li>
+		  <li class="u-pull-right cate"> <a href="http://joshi4.github.io//about/" class=""> About </a></li>
+		  
+		</ul>
+	  </div>
+	</div>
+  </div>
+</nav>
+
+
+<div class="container post-wrapper">
+  <div class="row">
+	<div class="eight columns offset-by-two">
+	  <div id="post-title">
+		<p class="footnote">
+		  
+		  <time class="">2014-08-01</time>
+		  
+		  
+		  |
+		  
+		  
+		  tags:<a href="http://joshi4.github.io//tags/ssh">ssh</a> <a href="http://joshi4.github.io//tags/public-private-key">public-private key</a> <a href="http://joshi4.github.io//tags/ca">CA</a> <a href="http://joshi4.github.io//tags/signing">signing</a> <a href="http://joshi4.github.io//tags/permissions">permissions</a> 
+		  
+
+		  
+
+		  
+
+		</p>
+		<h5>Crypto Learnings</h5>
+	  </div>
+
+	  <div class="post">
+		
+
+<p>This past week, I had the opportunity to better understand some of the things that go on under the hood during an <code>ssh</code> connection. Having never taken a crypto class at school, I started out with some background reading.</p>
+
+<h3 id="background-reading:947559ee93dc20c540618e721986ce23">Background Reading</h3>
+
+<p>I had heard a lot about <a href="https://engineering.purdue.edu/kak/">Prof. Avi Kak </a> while at Purdue and this was a perfect opportunity for me to peruse his <a href="https://engineering.purdue.edu/kak/compsec/Lectures.html">amazing notes</a> on computer security.</p>
+
+<p>The Lecture on Prime Numbers and Discrete Logs provided a great background for understanding the details of Public Key cryptography and RSA covered in the next lecture. Most of the material is self contained but I had to refer to an earlier lecture to refresh my memory of modular arithmetic. The lecture on Prime numbers starts with a discussion of <code>Fermat's Little Theorem</code> and then we build on it further by studying about Euler&rsquo;s totient function, which progresses naturally into a discussion about Euler&rsquo;s Theorem which ends up being a generalized version of Fermat&rsquo;s Little Theorem.</p>
+
+<p>We&rsquo;ve all written a program to test the primality of a number when first learning how to program. More often than not it involves iterating over all numbers from 2 to sqrt(N). A number N can be reprsented in <code>log N</code> bits and thus our algorithm is exponential in the number of bits required to reprsent N. Using the Theorems discussed above Miller and Rabin came up with the Miller-Rabin Algorithm  which is a probabilitic test for prime numbers. If their algorithm reports that a particular number is <code>NOT</code> a prime then it is definitely not a prime, but since the test is probabilitic we may sometimes get false positives, i:e it may report a number to be prime when it is infact composite. One way to increase our confidence and make the probability of error negligble is to repeat the test for different values of the parameter and if the algorithm always reports the number to prime then we can be very sure of the result. This ability to quickly verify the primality of a  number (even very large ones ) is plays a key role in making public key cryptography possible.</p>
+
+<p>I have not gone into detail about any of the above three theorems as a thorough discussion of each would require their own blog post and even then, the notes linked to previously will definitely be a better source for acquiring a full understanding of these topics. Based on this, we can proceed to Lecture 12 which delves into the RSA Algorithm</p>
+
+<h3 id="rsa-algorithm-for-public-key-cryptography:947559ee93dc20c540618e721986ce23">RSA Algorithm for Public Key Cryptography</h3>
+
+<h4 id="high-level-view:947559ee93dc20c540618e721986ce23">High Level View</h4>
+
+<p>If <strong>A</strong> and <strong>B</strong> want to communicate securely and be assured of the identity of the other party then, both of them can make their Public Keys available to each other in any convenient manner. It is of no consequence who can see an individual&rsquo;s public key. <strong>A</strong> will encrypt any message he wants to send to <strong>B</strong> using his <code>Private Key</code> ( which is named so because you are not meant to share this with any one, the entire security of this method of encrypting and decrypting messages relies on keeping this key a secret from everyone else. ) When <strong>B</strong> receives this encrypted message he can decrypt it using <strong>A</strong>&rsquo;s  Public Key. (It is safe to think of public and private key&rsquo;s being inverses of each other). Thus, if <strong>B</strong> is able to decrypt a message using A&rsquo;s public key then B can be sure that the message originated from A as no else can have access to A&rsquo;s private key. However, this solves only half the problem, any one with access to A&rsquo;s public key can decrypt the encoded message by A.</p>
+
+<p>If we want to ensure that only B can decrypt a message encrypted by A we have to add an additional step. We first encrypt the message we want to send using B&rsquo;s Public Key, the resulting message is then further encrypted using A&rsquo;s private key. Thus now when B receives this twice encoded message, he/she will first use A&rsquo;s Public Key to arrive at the first encrypted message which can be decoded to its orignal text using B&rsquo;s private key. Since no one but B has access to B&rsquo;s private key such a message provides but confidentiality and authentication. At this point you must be thinking &hellip;</p>
+
+<h4 id="how-exactly-do-we-come-up-with-these-public-and-private-keys:947559ee93dc20c540618e721986ce23">How Exactly do we come up with these Public and Private Keys ?</h4>
+
+<p>Magic. I mean Maths.</p>
+
+<ul>
+<li>The first thing we need to do is come up with a large number, lets call it <em>N</em>. However, <em>N</em> can&rsquo;t be just any large number, it must also be a product of two prime numbers, <em>p</em> and <em>q</em>.</li>
+<li>Then, choose a number <em>e</em> that is co-prime to the totient of <em>N</em>. This guarantees that there exists &hellip;
+
+<ul>
+<li>a number <em>d</em> that is the multiplicative inverse of <em>e</em> (under modulo phi(N), where phi(N) is the totient of N)</li>
+</ul></li>
+<li>The Public key is {e, n}</li>
+<li>The Private key is {d, n}</li>
+</ul>
+
+<p>These weird conditions on <em>N</em> and <em>e</em> will soon become clear.</p>
+
+<p>For the sake of simplicity, lets assume we are trying to encrypt a number M. To do this we can use our private key and generate</p>
+
+<pre><code>C = M ^ d (modulo N)
+</code></pre>
+
+<p>N
+Now to decrypt it we need the corresponding Public Key. Mathematically it can be represented as :</p>
+
+<pre><code>M' = C ^ e (modulo N)
+=&gt; M' = M ^ de (modulo N)
+</code></pre>
+
+<p>This would only work if <code>M' = M</code> and that means d and e need to be multiplicative inverses of each other.</p>
+
+<p><em>Rivest, Shamir and Adleman were able to show that when N is the product of two primes, in arithmetic modulo N the exponents behave modulo phi(N).</em> This guarantee along with the conditions placed on choosing <em>N</em> and <em>e</em> and <em>d</em> ensure that M&rsquo;= M.</p>
+
+<p>There are some best practices to follow when generating <em>p</em>  and <em>q</em> but essentially these are generated through a crytographically secure random number generator.</p>
+
+<p>As we have just seen RSA is an asymmetric cryptographic algorithm. It&rsquo;s not well suited to encrypt a large amount of data but is indispenable in providing a safe environment in which to exchange session keys between the two participants after which we can shift over to a symmetric algorithm.</p>
+
+<p>Well enough theory for now, lets look at a case where this theory might be useful.</p>
+
+<h3 id="applications-in-ssh:947559ee93dc20c540618e721986ce23">Applications in SSH</h3>
+
+<p>How many times have we had to encounter the following prompt when <em>ssh-ing into a machine for the first time</em></p>
+
+<pre><code>The authenticity of host 'hostname' can't be established.
+RSA key fingerprint is ff:ff:ff:ee:ff:aa:ff:ff:fe:ff:dd:ff:bb:bb:00:aa.
+Are you sure you want to continue connecting (yes/no)? yes
+</code></pre>
+
+<p>Blindly agreeing to such a connection can be just as harmful as the <em>Terms Of Service</em> that no one reads, but signs anyways. There&rsquo;s not much we can do about the latter, but can we do something about the former ? To know the answer to that, we need to dig a little deeper.</p>
+
+<p>When we try and connect to a host and it presents us with its public key we can&rsquo;t be sure that we are talking to the host we are trying to connect. Infact, blindly moving forward with the above prompt opens us to  a text-book <code>man in the middle attack</code>. So the ideal solution would be that the server/host shows us something that we can trust but at the same time is safe for everyone to see.</p>
+
+<h3 id="certificates:947559ee93dc20c540618e721986ce23">Certificates</h3>
+
+<p>Certificates are the exact solution for this problem. Not everyone can issue a certificate, they are issued only by designated certifying authorites. A certifying authority (CA) has a set of Public and Private Keys that it uses to create these certificates. So if you wanted to make your website secure, you would go to a CA and ask for a certificate. A CA will then use its <code>Private Key</code> to encode or <code>sign</code> your content and thus create a certificate.</p>
+
+<p>Now, whenever, some one wants to visit your website you will first show them the shiny new certificate. The browser will look at the CA that issued this and check in the client&rsquo;s local machine for the appropriate Public Key. How does one get this Public Key  you ask ? The answer is you don&rsquo;t. The CA works in tandem with computer manufacturer&rsquo;s ensuring that the machine ships with the required Public Keys.</p>
+
+<p>The most common instance of this is when your browser shows a green tab or a lock on your browser URL when you visit your bank&rsquo;s website or facebook.com. Since the CA uses its Private Key no malicious entity can forge a certificate and these CA&rsquo;s go to extra-oridnary lengths to ensure that their Private Key&rsquo;s stay that way.</p>
+
+<p>So can any one be a CA ? Well yes and no. The crucial element that makes this system work is trust. Your browser/program needs to be configured to accept the certificates that are presented by the banks and/or popular websites.</p>
+
+<p>So you can generate your own key pairs and if you have the power to do so, configure some machines to trust certificates authored by you and voila you are now a CA as well. The next post will go into detail about how this can be implemented.</p>
+
+	  </div>
+	</div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="container">
+	<div class="row">
+	  <div class="ten columns offset-by-two">
+		<p class="footnote">
+		  
+		  (c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy
+		  
+		  
+		  Find me at
+
+		  
+		  <a href="https://github.com/joshi4" >GitHub</a>
+		  
+
+		  
+
+		  
+
+		  
+
+		  
+		</p>
+	  </div>
+	</div>
+  </div>
+</div>
+
+
+<script src="http://joshi4.github.io//js/jquery.min.js" type="text/javascript"></script>
+<script src="http://joshi4.github.io//js/jquery.timeago.js" type="text/javascript"></script>
+<script type="text/javascript">
+  $(function(){
+    $("time.timeago").timeago();
+  })
+  $("#menu").click(function(){
+    $(".brand").text("HOME");
+    $(".navbar ul li").removeClass("cate");
+    $(".navbar").toggle();
+  });
+  $(window).resize(function(){
+    if(window.innerWidth > 768) {
+      $(".navbar").removeAttr("style");
+    }
+  });
+</script>
+
+</body>
+</html>
+

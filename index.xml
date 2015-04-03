@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shantanu Joshi</title>
+    <link>http://joshi4.github.io/</link>
+    <description>Recent content on Shantanu Joshi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
+    <lastBuildDate>Thu, 02 Apr 2015 00:33:10 -0700</lastBuildDate>
+    <atom:link href="http://joshi4.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Eraser: Data Race Detector</title>
+      <link>http://joshi4.github.io/post/eraser/</link>
+      <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
+      
+      <guid>http://joshi4.github.io/post/eraser/</guid>
+      <description>
+
+&lt;p&gt;Today, we discussed &lt;a href=&#34;http://cseweb.ucsd.edu/~savage/papers/Tocs97.pdf&#34;&gt;Eraser&lt;/a&gt;. It is essentially a tool to find data races in programs dynamically, i:e no static compile time checking.&lt;/p&gt;
+
+&lt;p&gt;During the time this paper was published, the big focus was on performance and not debugging. Thus, there was no competition in this areas and its utility is apparent even though it results in performance that is 10 to 30 times slower.&lt;/p&gt;
+
+&lt;p&gt;First, they talk about Leslie Lamport&amp;rsquo;s &lt;code&gt;Happens-before&lt;/code&gt; partial order which can be used to identify data races in some cases, but depends on the the scheduler and even then can miss detecting data races. An example of a data-race that will be missed is:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;Thread 1:           Thread 2: 
+
+y += 1                lock(m)
+lock (m)              x++
+x++                   unlock (m) 
+unlock (m)            y += 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Clearly, there is a data race on y here but with the happens-before partial order, if &lt;code&gt;Thread 1&lt;/code&gt; runs before Thread 2 then it does not detect the data race. A key advantage of &lt;code&gt;Eraser&lt;/code&gt; is that it is independent of the scheduler in findings bugs. The key to getting good results from Eraser is having good test coverage.&lt;/p&gt;
+
+&lt;p&gt;At a high level, their main algorithm is as follows:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;For every shared variable, have a candidate set.&lt;/li&gt;
+&lt;li&gt;When a shared variable in initialized, it&amp;rsquo;s candidate set is the set of all locks&lt;/li&gt;
+&lt;li&gt;On a read/write from another read, the candidate set is updated as: &lt;code&gt;CS /\= lockset (curr_thread)&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;If it turns out that &lt;code&gt;CS = {}&lt;/code&gt; then we have detected a data race. Since set intersection is commutative, the interleaving of threads does not matter.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To do this, &lt;code&gt;Eraser&lt;/code&gt; instruments every load/store resulting in the performance hit mentioned before. The algorithm as mentioned above needs to be extended to work for many other common cases like Shared-Reader-Writer Locks, Read-Shared Data and Initialization.&lt;/p&gt;
+
+&lt;p&gt;Shared variables are frequently initialized without holding any locks, as during this time, no other thread can hold a reference to this variable. To avoid false-alarms, a variables candidate set is refined only after it is initialized.&lt;/p&gt;
+
+&lt;p&gt;Further, simulataneous reads to a shared variable are not data races. As long as this is the case, Eraser will not report any errors.&lt;/p&gt;
+
+&lt;p&gt;These different cases are neatly accomodated into a single state-machine represented by Figure 4 in the paper.&lt;/p&gt;
+
+&lt;h2 id=&#34;experiments:342ad35872a16e059735c2e8cd40583b&#34;&gt;Experiments&lt;/h2&gt;
+
+&lt;p&gt;One of the things, I really liked about this paper is the effort they put in to conduct various studies. The authors use their tool on various production grade projects and see if they can find any bugs. While, they find some bugs, they also ran into issues regarding, intentional data-races for performance reasons, private implementations of malloc/free and locks. All of this led to many false positives. To fix this, they introduced &lt;code&gt;annotations&lt;/code&gt; which can help suppress various categories of bugs that &lt;code&gt;Eraser&lt;/code&gt; would report.&lt;/p&gt;
+
+&lt;p&gt;A limitation of the tool is that it works only on locks and not other synchronization primitives like semaphores, which means it only has limited utility in finding bugs in kernel code.&lt;/p&gt;
+
+&lt;p&gt;Lastly, they also used their tool to find bugs on undergraduate students&amp;rsquo; homework assignments and as expected find more bugs than in the mature production code.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Worse is Better</title>
+      <link>http://joshi4.github.io/post/worse_better/</link>
+      <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
+      
+      <guid>http://joshi4.github.io/post/worse_better/</guid>
+      <description>&lt;p&gt;I dropped into the CS240 lecture at Stanford this week and they were discussing &lt;a href=&#34;https://www.dreamsongs.com/RiseOfWorseIsBetter.html&#34;&gt;The Rise of Worse is Better&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It is a  very short paper and infact not very technical at all barring one example.&lt;/p&gt;
+
+&lt;p&gt;The main point the author, Richard Gabriel tries to make is that simplicity wins over correctness, completeness and consistency which was contrary to what many people at MIT believed at the time. He talks of C and Unix being viruses which survived because they were easy to acquire.&lt;/p&gt;
+
+&lt;p&gt;Examples of this include: the fork/exec model in *nix as opposed to windows and the PC-loser-ing problem mentioned in the paper.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Crypto Learnings</title>
+      <link>http://joshi4.github.io/post/cryptolearnings/</link>
+      <pubDate>Fri, 01 Aug 2014 04:21:23 +0000</pubDate>
+      
+      <guid>http://joshi4.github.io/post/cryptolearnings/</guid>
+      <description>
+
+&lt;p&gt;This past week, I had the opportunity to better understand some of the things that go on under the hood during an &lt;code&gt;ssh&lt;/code&gt; connection. Having never taken a crypto class at school, I started out with some background reading.&lt;/p&gt;
+
+&lt;h3 id=&#34;background-reading:947559ee93dc20c540618e721986ce23&#34;&gt;Background Reading&lt;/h3&gt;
+
+&lt;p&gt;I had heard a lot about &lt;a href=&#34;https://engineering.purdue.edu/kak/&#34;&gt;Prof. Avi Kak &lt;/a&gt; while at Purdue and this was a perfect opportunity for me to peruse his &lt;a href=&#34;https://engineering.purdue.edu/kak/compsec/Lectures.html&#34;&gt;amazing notes&lt;/a&gt; on computer security.&lt;/p&gt;
+
+&lt;p&gt;The Lecture on Prime Numbers and Discrete Logs provided a great background for understanding the details of Public Key cryptography and RSA covered in the next lecture. Most of the material is self contained but I had to refer to an earlier lecture to refresh my memory of modular arithmetic. The lecture on Prime numbers starts with a discussion of &lt;code&gt;Fermat&#39;s Little Theorem&lt;/code&gt; and then we build on it further by studying about Euler&amp;rsquo;s totient function, which progresses naturally into a discussion about Euler&amp;rsquo;s Theorem which ends up being a generalized version of Fermat&amp;rsquo;s Little Theorem.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ve all written a program to test the primality of a number when first learning how to program. More often than not it involves iterating over all numbers from 2 to sqrt(N). A number N can be reprsented in &lt;code&gt;log N&lt;/code&gt; bits and thus our algorithm is exponential in the number of bits required to reprsent N. Using the Theorems discussed above Miller and Rabin came up with the Miller-Rabin Algorithm  which is a probabilitic test for prime numbers. If their algorithm reports that a particular number is &lt;code&gt;NOT&lt;/code&gt; a prime then it is definitely not a prime, but since the test is probabilitic we may sometimes get false positives, i:e it may report a number to be prime when it is infact composite. One way to increase our confidence and make the probability of error negligble is to repeat the test for different values of the parameter and if the algorithm always reports the number to prime then we can be very sure of the result. This ability to quickly verify the primality of a  number (even very large ones ) is plays a key role in making public key cryptography possible.&lt;/p&gt;
+
+&lt;p&gt;I have not gone into detail about any of the above three theorems as a thorough discussion of each would require their own blog post and even then, the notes linked to previously will definitely be a better source for acquiring a full understanding of these topics. Based on this, we can proceed to Lecture 12 which delves into the RSA Algorithm&lt;/p&gt;
+
+&lt;h3 id=&#34;rsa-algorithm-for-public-key-cryptography:947559ee93dc20c540618e721986ce23&#34;&gt;RSA Algorithm for Public Key Cryptography&lt;/h3&gt;
+
+&lt;h4 id=&#34;high-level-view:947559ee93dc20c540618e721986ce23&#34;&gt;High Level View&lt;/h4&gt;
+
+&lt;p&gt;If &lt;strong&gt;A&lt;/strong&gt; and &lt;strong&gt;B&lt;/strong&gt; want to communicate securely and be assured of the identity of the other party then, both of them can make their Public Keys available to each other in any convenient manner. It is of no consequence who can see an individual&amp;rsquo;s public key. &lt;strong&gt;A&lt;/strong&gt; will encrypt any message he wants to send to &lt;strong&gt;B&lt;/strong&gt; using his &lt;code&gt;Private Key&lt;/code&gt; ( which is named so because you are not meant to share this with any one, the entire security of this method of encrypting and decrypting messages relies on keeping this key a secret from everyone else. ) When &lt;strong&gt;B&lt;/strong&gt; receives this encrypted message he can decrypt it using &lt;strong&gt;A&lt;/strong&gt;&amp;rsquo;s  Public Key. (It is safe to think of public and private key&amp;rsquo;s being inverses of each other). Thus, if &lt;strong&gt;B&lt;/strong&gt; is able to decrypt a message using A&amp;rsquo;s public key then B can be sure that the message originated from A as no else can have access to A&amp;rsquo;s private key. However, this solves only half the problem, any one with access to A&amp;rsquo;s public key can decrypt the encoded message by A.&lt;/p&gt;
+
+&lt;p&gt;If we want to ensure that only B can decrypt a message encrypted by A we have to add an additional step. We first encrypt the message we want to send using B&amp;rsquo;s Public Key, the resulting message is then further encrypted using A&amp;rsquo;s private key. Thus now when B receives this twice encoded message, he/she will first use A&amp;rsquo;s Public Key to arrive at the first encrypted message which can be decoded to its orignal text using B&amp;rsquo;s private key. Since no one but B has access to B&amp;rsquo;s private key such a message provides but confidentiality and authentication. At this point you must be thinking &amp;hellip;&lt;/p&gt;
+
+&lt;h4 id=&#34;how-exactly-do-we-come-up-with-these-public-and-private-keys:947559ee93dc20c540618e721986ce23&#34;&gt;How Exactly do we come up with these Public and Private Keys ?&lt;/h4&gt;
+
+&lt;p&gt;Magic. I mean Maths.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The first thing we need to do is come up with a large number, lets call it &lt;em&gt;N&lt;/em&gt;. However, &lt;em&gt;N&lt;/em&gt; can&amp;rsquo;t be just any large number, it must also be a product of two prime numbers, &lt;em&gt;p&lt;/em&gt; and &lt;em&gt;q&lt;/em&gt;.&lt;/li&gt;
+&lt;li&gt;Then, choose a number &lt;em&gt;e&lt;/em&gt; that is co-prime to the totient of &lt;em&gt;N&lt;/em&gt;. This guarantees that there exists &amp;hellip;
+
+&lt;ul&gt;
+&lt;li&gt;a number &lt;em&gt;d&lt;/em&gt; that is the multiplicative inverse of &lt;em&gt;e&lt;/em&gt; (under modulo phi(N), where phi(N) is the totient of N)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;The Public key is {e, n}&lt;/li&gt;
+&lt;li&gt;The Private key is {d, n}&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;These weird conditions on &lt;em&gt;N&lt;/em&gt; and &lt;em&gt;e&lt;/em&gt; will soon become clear.&lt;/p&gt;
+
+&lt;p&gt;For the sake of simplicity, lets assume we are trying to encrypt a number M. To do this we can use our private key and generate&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;C = M ^ d (modulo N)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;N
+Now to decrypt it we need the corresponding Public Key. Mathematically it can be represented as :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;M&#39; = C ^ e (modulo N)
+=&amp;gt; M&#39; = M ^ de (modulo N)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This would only work if &lt;code&gt;M&#39; = M&lt;/code&gt; and that means d and e need to be multiplicative inverses of each other.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Rivest, Shamir and Adleman were able to show that when N is the product of two primes, in arithmetic modulo N the exponents behave modulo phi(N).&lt;/em&gt; This guarantee along with the conditions placed on choosing &lt;em&gt;N&lt;/em&gt; and &lt;em&gt;e&lt;/em&gt; and &lt;em&gt;d&lt;/em&gt; ensure that M&amp;rsquo;= M.&lt;/p&gt;
+
+&lt;p&gt;There are some best practices to follow when generating &lt;em&gt;p&lt;/em&gt;  and &lt;em&gt;q&lt;/em&gt; but essentially these are generated through a crytographically secure random number generator.&lt;/p&gt;
+
+&lt;p&gt;As we have just seen RSA is an asymmetric cryptographic algorithm. It&amp;rsquo;s not well suited to encrypt a large amount of data but is indispenable in providing a safe environment in which to exchange session keys between the two participants after which we can shift over to a symmetric algorithm.&lt;/p&gt;
+
+&lt;p&gt;Well enough theory for now, lets look at a case where this theory might be useful.&lt;/p&gt;
+
+&lt;h3 id=&#34;applications-in-ssh:947559ee93dc20c540618e721986ce23&#34;&gt;Applications in SSH&lt;/h3&gt;
+
+&lt;p&gt;How many times have we had to encounter the following prompt when &lt;em&gt;ssh-ing into a machine for the first time&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;The authenticity of host &#39;hostname&#39; can&#39;t be established.
+RSA key fingerprint is ff:ff:ff:ee:ff:aa:ff:ff:fe:ff:dd:ff:bb:bb:00:aa.
+Are you sure you want to continue connecting (yes/no)? yes
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Blindly agreeing to such a connection can be just as harmful as the &lt;em&gt;Terms Of Service&lt;/em&gt; that no one reads, but signs anyways. There&amp;rsquo;s not much we can do about the latter, but can we do something about the former ? To know the answer to that, we need to dig a little deeper.&lt;/p&gt;
+
+&lt;p&gt;When we try and connect to a host and it presents us with its public key we can&amp;rsquo;t be sure that we are talking to the host we are trying to connect. Infact, blindly moving forward with the above prompt opens us to  a text-book &lt;code&gt;man in the middle attack&lt;/code&gt;. So the ideal solution would be that the server/host shows us something that we can trust but at the same time is safe for everyone to see.&lt;/p&gt;
+
+&lt;h3 id=&#34;certificates:947559ee93dc20c540618e721986ce23&#34;&gt;Certificates&lt;/h3&gt;
+
+&lt;p&gt;Certificates are the exact solution for this problem. Not everyone can issue a certificate, they are issued only by designated certifying authorites. A certifying authority (CA) has a set of Public and Private Keys that it uses to create these certificates. So if you wanted to make your website secure, you would go to a CA and ask for a certificate. A CA will then use its &lt;code&gt;Private Key&lt;/code&gt; to encode or &lt;code&gt;sign&lt;/code&gt; your content and thus create a certificate.&lt;/p&gt;
+
+&lt;p&gt;Now, whenever, some one wants to visit your website you will first show them the shiny new certificate. The browser will look at the CA that issued this and check in the client&amp;rsquo;s local machine for the appropriate Public Key. How does one get this Public Key  you ask ? The answer is you don&amp;rsquo;t. The CA works in tandem with computer manufacturer&amp;rsquo;s ensuring that the machine ships with the required Public Keys.&lt;/p&gt;
+
+&lt;p&gt;The most common instance of this is when your browser shows a green tab or a lock on your browser URL when you visit your bank&amp;rsquo;s website or facebook.com. Since the CA uses its Private Key no malicious entity can forge a certificate and these CA&amp;rsquo;s go to extra-oridnary lengths to ensure that their Private Key&amp;rsquo;s stay that way.&lt;/p&gt;
+
+&lt;p&gt;So can any one be a CA ? Well yes and no. The crucial element that makes this system work is trust. Your browser/program needs to be configured to accept the certificates that are presented by the banks and/or popular websites.&lt;/p&gt;
+
+&lt;p&gt;So you can generate your own key pairs and if you have the power to do so, configure some machines to trust certificates authored by you and voila you are now a CA as well. The next post will go into detail about how this can be implemented.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Small Gotcha in Go slices</title>
+      <link>http://joshi4.github.io/post/slices/</link>
+      <pubDate>Mon, 21 Jul 2014 04:21:44 +0000</pubDate>
+      
+      <guid>http://joshi4.github.io/post/slices/</guid>
+      <description>&lt;p&gt;I am back to writing programs in Go after almost a year. Today, I ran into an issue at work that led me to re-read some important docs and revisit the fundamentals of slices in Go.&lt;/p&gt;
+
+&lt;p&gt;The issue is best explained using the ( representative )code below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;func main(){
+
+slice := make([]string, 5)
+slice = append(slice, &amp;quot;foo&amp;quot;)
+fmt.Println(slice)
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The output it provides was slightly confusing to me. I was expecting the output to be &lt;code&gt;[&amp;quot;foo&amp;quot;]&lt;/code&gt; instead it turned out to be :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;[    &amp;quot;foo&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can verify it &lt;a href=&#34;http://play.golang.org/p/f1vw8_0cfM&#34;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I thought that this was something to do with Slices so I read the following two blog posts again to see if I had forgotten something fundamental&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://blog.golang.org/go-slices-usage-and-internals&#34;&gt;Go slices : usage and internal &lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://blog.golang.org/slices&#34;&gt;The mechanics of &amp;lsquo;append&amp;rsquo; &lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;While very useful in refreshing my memory of &lt;code&gt;slices&lt;/code&gt; and &lt;code&gt;append&lt;/code&gt; I wasn&amp;rsquo;t able to immediately pin point what was wrong. In order to quickly get the job done and test if I was on the right track I resorted to using unidiomatic go and basically treated the slice as a regular array and indexed into it directly to &amp;ldquo;append&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;After verifying that I was on the right track, I experimented with the bug to see if I could determine my error.&lt;/p&gt;
+
+&lt;p&gt;Maybe it was a problem when  appending to an empty slice , so let me add some elements then try it. No dice. On second thoughts appending to an empty slice should never be a problem, that&amp;rsquo;s just absurd.&lt;/p&gt;
+
+&lt;p&gt;After some more experimentation, I finally asked a colleague  and he pointed out my bug immediately. I had initialized the length and capacity of the slice to &lt;code&gt;5&lt;/code&gt; and that was the source of my problems. Thinking of it in terms of an empty slice was my biggest mistake. &lt;code&gt;Go automatically initializes the underlying array with the appropriate default value&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;intSlice := make([]int, 5) // underlying array is -&amp;gt; {0,0,0,0,0}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So the empty space which I thought was &lt;code&gt;&amp;lt;nil&amp;gt;&lt;/code&gt; turned out to be the empty string. In hindsight, I should have immediately discarded the thought that it was &lt;code&gt;&amp;lt;nil&amp;gt;&lt;/code&gt; as Go reports a nil value in the same format as I have used above.&lt;/p&gt;
+
+&lt;p&gt;So because I had been lazy and specified both the length and capacity as one, make had gone an allocated the underlying array of my desired capacity but while I assumed the length would be zero it was actually 5.&lt;/p&gt;
+
+&lt;p&gt;It can easily be verified by running the following snippet:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;func main(){
+
+slice := make([]string, 5)
+slice = append(slice, &amp;quot;foo&amp;quot;)
+fmt.Println(len(slice)) // output is 6. 
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The solution is as simple as :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;func main(){
+
+slice := make([]string, 0, 5)
+slice = append(slice, &amp;quot;foo&amp;quot;)
+fmt.Println(slice) 
+
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-ruby&#34;&gt;[&amp;quot;foo&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now the capacity of the underlying array is &lt;code&gt;5&lt;/code&gt; but it&amp;rsquo;s length is &lt;code&gt;0&lt;/code&gt;( to start with) so &lt;code&gt;make&lt;/code&gt; can&amp;rsquo;t initialize any elements. Thus now when we use append, we get the expected result&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;TL;DR:&lt;/strong&gt; &lt;em&gt;Don&amp;rsquo;t forget that Go helps out by automatically initialzing underlying array of a slice with sensible defaults.&lt;/em&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The Sceptical Patriot: Highlights</title>
+      <link>http://joshi4.github.io/post/sceptical/</link>
+      <pubDate>Sun, 20 Jul 2014 07:44:42 +0000</pubDate>
+      
+      <guid>http://joshi4.github.io/post/sceptical/</guid>
+      <description>&lt;p&gt;I recently read &lt;a href=&#34;http://www.amazon.com/Sceptical-Patriot-Exploring-Truths-Glories-ebook/dp/B00K35G7ZO/ref=sr_1_1?ie=UTF8&amp;amp;qid=1404020995&amp;amp;sr=8-1&amp;amp;keywords=the+sceptical+patriot&#34;&gt;The Sceptical Patriot: Exploring the Truths Behind the Zero and Other Indian Glories &lt;/a&gt; and thought it was one of the best books I have read in the recent past. We&amp;rsquo;ve all been part of patriotic email chains ( when that was a thing) and now patriotic posts on Facebook extolling the greatness of our ancestors and their many path breaking contributions without which modern society would be lost.&lt;/p&gt;
+
+&lt;p&gt;This book takes an unvarnished look at some of the most famous and widely propogated India Facts and examines them through an unbiased lens backed by facts as best the author can find, which we learn throughout the book can be a suprisingly hard thing.&lt;/p&gt;
+
+&lt;p&gt;I thought the best way to evangelize the book would be to share my highlights. These are equal parts hilarious, profound, refreshing, irreverent and seemingly accidently educational. So without further ado here they are:&lt;/p&gt;
+
+&lt;p&gt;A word of caution: These are my highlights and may not adequately represent the entire context, so please do yourself a favour and read the whole book.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;The Sushruta Samhita is, to put it mildly, mind-blowing. It is astonishing that while the existence of this text is taught to most Indian school
+ children, the contents are often ignored. It describes, for instance, 76 types of eye-diseases, 121 sharp and blunt instruments used in surgery, 42 surgical processes and 700 plants of medicinal value divided into 37 groups of diseases.What other pioneering techniques does the Sushruta Samhita explain? An English translation seems well worth the investment. There are free ones on the Internet.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;There, starting of the on the right foot.&lt;/p&gt;
+
+&lt;p&gt;India has never invaded another country in its glorious &lt;strong&gt;10,000&lt;/strong&gt; history right ?&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;I’m really hoping that this information sends your jaw crashing to the floor and somersaulting out of the door. Yes, an empire based in Tamil Nadu once used to rule over vast chunks of Southeast Asia! (I hope you’re not thinking of Java, the computer programming language. That is not the Java I am referring to. Though, of course, many people would say that a vast empire of Tamils, spread out across the world, rules over that other Java too.)&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;How utterly inaccurate. As any resident of the region will tell you, intercourse is not only rare but almost universally forbidden across most of South India. Instead, locals are encouraged to spend their lives in prayer and IIT coaching.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;You, my reader, live closer in time to Rajendra Chola III than he did to the first Chola kings. Think about that.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;The numbers eka [one], dasa [ten], sata [hundred], sahasra [thousand], ayuta [ten thousand], niyuta [hundred thousand], prayuta [million], koti [ten million], arbuda [hundred million], and vrnda [thousand million] are from place to place each ten times the preceding.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;making decimal system possible. nbd.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Aurangzeb was both a great administrator and a ruthless expansionist. Which, on the face of it, seems like a good thing for the Mughal Empire. Under him, the empire and its system of revenue collection became a cash-generating machine. Unfortunately, Aurangzeb was also a religious nut-job and a divisive jerk who pissed off nearly everybody in the empire by the time he died in 1707.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;An astonishing £90 billion, in today’s money, was written off without so much as a fiscal burp. Thus nicely preparing the Indian peoples for the future invention of Air India.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Millions of people in both countries live without access to food, water, shelter, education or the latest Apple products.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Sone ki chiddiya ?&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;This new narrative of Indian colonial economy has been my greatest learning in the course of this Sceptical investigation. To me, it seems that the British Empire’s economic crime was not making a rich country poor but taking a somewhat moribund economy and keeping it that way while the rest of the world whooshed by. The story of how that crime took place is interesting, infuriating and a little depressing. And not at all meant for this book.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;It was audacious because Marconi set up a company that would make and sell radio equipment despite having technology that was experimental at best, intellectual property of dubious originality, and practically no clients. Its roots may have been precarious, but in one form or the other this company would last for more than a century.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Something for the western audience here :&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;The extremely Eurocentric nature of Christian art and scripture might give you the impression that Jesus was a gorgeous chestnut blonde with milky-white skin who spoke in flawless Latin. But in reality, he was probably a sunburnt chap, roaming around a sunburnt land, speaking Aramaic, the lingua franca of the time. All thanks, in large part, to the Achaemenid decision around 500 BCE to make Aramaic the official administrative language of the empire.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Laugh first, reflect later, forget immediately.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;After their presentation, the Hibakusha asked the children: Should countries go to war? No, they all said in chorus. Should countries use nuclear weapons? No! Should India use nuclear weapons? Never! What if the enemy is Pakistan? Oh, Pakistan is a special case, the kids said, we should totally nuke them. Every time I retell this story at a public forum, there is an explosion of laughter…followed by an awkward silence. These were primary school students—children too young to be taught any serious history in school, children much too young to appreciate any aspect of India’s complicated relationship with Pakistan. And yet, these children had no hesitation in picking out Pakistan for a nuclear attack. Pakistan, to these tiny, partly formed minds, was already a special case—the great enemy. Somehow, we’ve managed to create a social, cultural and political environment in which even our youngest citizens have been so deeply indoctrinated to hate. Who else, I wonder, have we indoctrinated them against? Little Muslim kids against Hindus? Little Hindu kids against Muslims? Little Dalits against all Yadavs? Still, the people who manage our school curricula feel no need to actually teach them any aspect of post-Independence Indian history. This, despite the fact that the last six decades of Indian history have so much to tell us about the tensions that currently determine our political and social existence. Why should each generation be brought up on the selective prejudices of the one before it? I believe that this is exactly the point of history. And not just reading or studying history but also approaching it with a sceptical bent of mind. When each generation approaches received wisdom with scepticism, perhaps it will reassess established notions of right and wrong, love and hate. Perhaps it will finally see mistaken priorities for what they really are. Perhaps it will do something that previous generations steadfastly refused to do.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;I am not suggesting that history or scepticism by themselves can provide all the answers to all these questions. History, after all, is not a forward-looking discipline. It can only tell us what happened the last time, not what will happen next time. Similarly, scepticism is hardly sufficient to do anything but ask questions. But together they—history and scepticism—form a potent force for enquiry.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Are you writing this to prove that a lot of Indian people are idiots? Or is there a greater point?’ No doubt, there are many people here who feel that all this is a load of liberal, the-world-is-one-big-family nonsense. That this is the kind of hippie-nonsense that makes nations weak and citizens unpatriotic. Perhaps. But only when you reduce the idea of identity, patriotism and humanity to its crudest line-in-the-sand form. Indeed, a true Indian, an Indian cognizant of the frenzied history of his or her past, must be proud not of his or her identity but of the utter lack of identity. We carry in our blood not pure Hindu, Muslim or Christian platelets. On the contrary, an entire planet’s worth of history courses through our veins.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;the average Indian does not need the expensive equipment or complex education of a genetic scientist to appreciate this lack of identity. He or she just needs to look into his or her lunchbox. Yet, just six hundred years ago, the aloo gobi was unheard of in India, not because it was some sort of state secret, but because potatoes, tomatoes and green chillies simply didn’t exist. The potato, tomato and green chilli are all vegetables that originated in South America and were brought to Europe by Spanish conquerors as part of what is now known as the ‘Columbian Exchange’—a process by which South Americans gave the world a number of culinary treasures, and in return got enslaved and murdered.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Well that escalated quickly .&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Think about that for a second. In less than one century, an entire country, with about eighteen per cent of the world’s population and impossibly diverse culinary cultures and preferences, went from looking at the tomato with suspicion to consuming it with absolutely everything. Now, there are two ways of looking at this. You can lament the ease with which we allow our ‘culture’ to be diluted. You can reject the foreign and glorify the native. You can lionize our ‘Indian’ history—whatever that means—draw a line across a period in time and reject everything that came afterwards. Or you can celebrate our ability to absorb. From Greek invaders to Persian architecture to South American tomatoes—we absorbed everything. We integrated them deeply into our culture and identity and history.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;This is going to piss off a lot of people, and I am buying asbestos underwear as I type, but…we need to stop asking the history of centuries past to vindicate our actions today. History is not a manifesto for action, a list of crimes to be avenged, a litany of positions to be reversed or a collection of rights to be wronged. No, really. Why not just say: ‘You know what? Maybe I should be seeking justice for the future rather than seek justice for the past&amp;hellip;’? Just an idea. Or we can keep killing each other.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Lets end on a good note.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;But most of all, we need a society that refuses to conform, that refuses to put up social, political and ideological borders. Perhaps, we need to go back to being the great cultural sponge that we once used to be. Maybe then, we will stop harking back to our glory days and a long list of dubious ‘India facts’, and create a few new ones.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;I hope you had a good laugh and will decide to spend a couple of hours reading the fascinating book and making your conclusions about what it has to say.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>first</title>
+      <link>http://joshi4.github.io/post/first/</link>
+      <pubDate>Tue, 17 Jun 2014 04:21:44 +0000</pubDate>
+      
+      <guid>http://joshi4.github.io/post/first/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Hello&lt;/em&gt; &lt;strong&gt;World&lt;/strong&gt; &lt;code&gt;!!&lt;/code&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>http://joshi4.github.io/about/</link>
+      <pubDate>Tue, 17 Jun 2014 04:20:23 +0000</pubDate>
+      
+      <guid>http://joshi4.github.io/about/</guid>
+      <description>&lt;p&gt;Afer completing my undergraduate studies from Purdue, I am currently pursuing my Master&amp;rsquo;s in Computer Science at Stanford.&lt;/p&gt;
+
+&lt;p&gt;I have previously interned at Qualcomm and ZOHO. This summer, I will be interning at CoreOS&lt;/p&gt;
+
+&lt;p&gt;Feel free to contact me at: &lt;code&gt;joshi4 AT stanford DOT edu&lt;/code&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

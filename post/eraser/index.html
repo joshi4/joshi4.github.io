@@ -1,0 +1,175 @@
+<html lang="en">
+<head>
+
+  
+  <meta charset="utf-8">
+  <title>Eraser: Data Race Detector</title>
+  <meta name="description" content="Eraser: Data Race Detector">
+  <meta name="author" content="Shantanu Joshi">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="http://joshi4.github.io//css/fonts.css">
+  <link rel="stylesheet" href="http://joshi4.github.io//css/normalize.css">
+  <link rel="stylesheet" href="http://joshi4.github.io//css/skeleton.css">
+  <link rel="stylesheet" href="http://joshi4.github.io//css/custom.css">
+
+  
+  
+  <link rel="stylesheet" href="http://joshi4.github.io//highlight/styles/default.css">
+  
+  <script src="http://joshi4.github.io//highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+<body>
+
+<header id="menu">
+  <div class="container">
+	<span class="logo">Shantanu Joshi</span>
+	<a>&#9776;</a>
+  </div>
+</header>
+
+<nav class="navbar">
+  <div class="container">
+	<div class="row">
+	  <div class="eight columns offset-by-two">
+		<ul class="">
+		  
+		  <li class="u-pull-left"> <a href="http://joshi4.github.io/" class="brand" style="font-weight:bold;font-size:normal"> Shantanu Joshi </a></li>
+		  <li class="u-pull-right cate"> <a href="http://joshi4.github.io//about/" class=""> About </a></li>
+		  
+		</ul>
+	  </div>
+	</div>
+  </div>
+</nav>
+
+
+<div class="container post-wrapper">
+  <div class="row">
+	<div class="eight columns offset-by-two">
+	  <div id="post-title">
+		<p class="footnote">
+		  
+		  <time class="">2015-04-02</time>
+		  
+		  
+		  |
+		  
+		  
+		  tags:<a href="http://joshi4.github.io//tags/stanford">stanford</a> <a href="http://joshi4.github.io//tags/os">os</a> 
+		  
+
+		  
+
+		  
+
+		</p>
+		<h5>Eraser: Data Race Detector</h5>
+	  </div>
+
+	  <div class="post">
+		
+
+<p>Today, we discussed <a href="http://cseweb.ucsd.edu/~savage/papers/Tocs97.pdf">Eraser</a>. It is essentially a tool to find data races in programs dynamically, i:e no static compile time checking.</p>
+
+<p>During the time this paper was published, the big focus was on performance and not debugging. Thus, there was no competition in this areas and its utility is apparent even though it results in performance that is 10 to 30 times slower.</p>
+
+<p>First, they talk about Leslie Lamport&rsquo;s <code>Happens-before</code> partial order which can be used to identify data races in some cases, but depends on the the scheduler and even then can miss detecting data races. An example of a data-race that will be missed is:</p>
+
+<pre><code class="language-c">Thread 1:           Thread 2: 
+
+y += 1                lock(m)
+lock (m)              x++
+x++                   unlock (m) 
+unlock (m)            y += 1
+</code></pre>
+
+<p>Clearly, there is a data race on y here but with the happens-before partial order, if <code>Thread 1</code> runs before Thread 2 then it does not detect the data race. A key advantage of <code>Eraser</code> is that it is independent of the scheduler in findings bugs. The key to getting good results from Eraser is having good test coverage.</p>
+
+<p>At a high level, their main algorithm is as follows:</p>
+
+<ul>
+<li>For every shared variable, have a candidate set.</li>
+<li>When a shared variable in initialized, it&rsquo;s candidate set is the set of all locks</li>
+<li>On a read/write from another read, the candidate set is updated as: <code>CS /\= lockset (curr_thread)</code></li>
+<li>If it turns out that <code>CS = {}</code> then we have detected a data race. Since set intersection is commutative, the interleaving of threads does not matter.</li>
+</ul>
+
+<p>To do this, <code>Eraser</code> instruments every load/store resulting in the performance hit mentioned before. The algorithm as mentioned above needs to be extended to work for many other common cases like Shared-Reader-Writer Locks, Read-Shared Data and Initialization.</p>
+
+<p>Shared variables are frequently initialized without holding any locks, as during this time, no other thread can hold a reference to this variable. To avoid false-alarms, a variables candidate set is refined only after it is initialized.</p>
+
+<p>Further, simulataneous reads to a shared variable are not data races. As long as this is the case, Eraser will not report any errors.</p>
+
+<p>These different cases are neatly accomodated into a single state-machine represented by Figure 4 in the paper.</p>
+
+<h2 id="experiments:342ad35872a16e059735c2e8cd40583b">Experiments</h2>
+
+<p>One of the things, I really liked about this paper is the effort they put in to conduct various studies. The authors use their tool on various production grade projects and see if they can find any bugs. While, they find some bugs, they also ran into issues regarding, intentional data-races for performance reasons, private implementations of malloc/free and locks. All of this led to many false positives. To fix this, they introduced <code>annotations</code> which can help suppress various categories of bugs that <code>Eraser</code> would report.</p>
+
+<p>A limitation of the tool is that it works only on locks and not other synchronization primitives like semaphores, which means it only has limited utility in finding bugs in kernel code.</p>
+
+<p>Lastly, they also used their tool to find bugs on undergraduate students&rsquo; homework assignments and as expected find more bugs than in the mature production code.</p>
+
+	  </div>
+	</div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="container">
+	<div class="row">
+	  <div class="ten columns offset-by-two">
+		<p class="footnote">
+		  
+		  (c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy
+		  
+		  
+		  Find me at
+
+		  
+		  <a href="https://github.com/joshi4" >GitHub</a>
+		  
+
+		  
+
+		  
+
+		  
+
+		  
+		</p>
+	  </div>
+	</div>
+  </div>
+</div>
+
+
+<script src="http://joshi4.github.io//js/jquery.min.js" type="text/javascript"></script>
+<script src="http://joshi4.github.io//js/jquery.timeago.js" type="text/javascript"></script>
+<script type="text/javascript">
+  $(function(){
+    $("time.timeago").timeago();
+  })
+  $("#menu").click(function(){
+    $(".brand").text("HOME");
+    $(".navbar ul li").removeClass("cate");
+    $(".navbar").toggle();
+  });
+  $(window).resize(function(){
+    if(window.innerWidth > 768) {
+      $(".navbar").removeAttr("style");
+    }
+  });
+</script>
+
+</body>
+</html>
+

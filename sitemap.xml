@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://joshi4.github.io/</loc>
+    <lastmod>2015-04-02T00:33:10-07:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/post/eraser/</loc>
+    <lastmod>2015-04-02T00:33:10-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/post/worse_better/</loc>
+    <lastmod>2015-04-02T00:33:10-07:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/post/cryptolearnings/</loc>
+    <lastmod>2014-08-01T04:21:23+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/post/slices/</loc>
+    <lastmod>2014-07-21T04:21:44+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/post/sceptical/</loc>
+    <lastmod>2014-07-20T07:44:42+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/post/first/</loc>
+    <lastmod>2014-06-17T04:21:44+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://joshi4.github.io/about/</loc>
+    <lastmod>2014-06-17T04:20:23+00:00</lastmod>
+  </url>
+  
+</urlset>

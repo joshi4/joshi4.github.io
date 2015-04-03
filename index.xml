@@ -7,13 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
-    <lastBuildDate>Thu, 02 Apr 2015 00:33:10 -0700</lastBuildDate>
+    <lastBuildDate>Thu, 02 Apr 2015 18:33:10 -0700</lastBuildDate>
     <atom:link href="http://joshi4.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Eraser: Data Race Detector</title>
       <link>http://joshi4.github.io/post/eraser/</link>
-      <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
+      <pubDate>Thu, 02 Apr 2015 18:33:10 -0700</pubDate>
       
       <guid>http://joshi4.github.io/post/eraser/</guid>
       <description>

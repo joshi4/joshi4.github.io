@@ -11,16 +11,82 @@
     <atom:link href="http://joshi4.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>lagrange</title>
-      <link>http://joshi4.github.io/post/lagrange/</link>
+      <title>Lagrange Multiplier I</title>
+      <link>http://joshi4.github.io/post/lagrange-equality/</link>
       <pubDate>Fri, 10 Apr 2015 15:28:04 -0700</pubDate>
       
-      <guid>http://joshi4.github.io/post/lagrange/</guid>
-      <description>&lt;p&gt;This is an example of inline mathematic (\Re)&lt;/p&gt;
+      <guid>http://joshi4.github.io/post/lagrange-equality/</guid>
+      <description>
 
-&lt;p&gt;This is on a line of its own:&lt;/p&gt;
+&lt;p&gt;I found an excellent writeup by Dan Klein explaining the intuition behind the &lt;a href=&#34;http://www.cs.berkeley.edu/~klein/papers/lagrange-multipliers.pdf&#34;&gt;Lagrange Multiplier&lt;/a&gt;. What follows is some notes for myself on the use of Lagrange Multipliers in the restricted case of equality constraints.&lt;/p&gt;
 
-&lt;p&gt;$$ \nabla $$&lt;/p&gt;
+&lt;p&gt;First, lets review how we would go about unconstrained maximisation (minimization) of a function: $$ f(x_1, x_2, \ldots, x_n) \colon \Re^{N} \rightarrow \Re $$&lt;/p&gt;
+
+&lt;p&gt;This can be accomplished by finding those points where the gradient of f is 0 ( more specifically 0 vector ). Mathematically, its stated as below: $$ \nabla f = 0 $$&lt;/p&gt;
+
+&lt;p&gt;Now the above equation alone is not enough, we may have a minima instead of a maxima or vice-versa. To be sure that we have a point that we are interested in we need to check the properites of the second derivative ( or the Hessian ). Or we can simply check the values of \(f\) in and around the point where the gradient is zero and conclude wether the point is an extrema that we are interested in. This issue will be ignored for the rest of the post.&lt;/p&gt;
+
+&lt;h2 id=&#34;constrained-optimization:1d538ec01cc68949f4ab2ef62a40a650&#34;&gt;Constrained Optimization&lt;/h2&gt;
+
+&lt;p&gt;In a constrained optimization problem, we not only have to maximise( or minimise ) a function \(f\) but also satisfy any constraints \(g(x) = 0 \). The set of points in \(\Re^{N}\) which satisfy the constraint \(g(x) = 0 \) together form the &lt;strong&gt;feasible region&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Klein goes onto show some simple examples of constrained optimization problems which can all be solved by substitution, however this approach does not scale well and gets complicated real fast. Its better to understand how Lagrange Multipliers work.&lt;/p&gt;
+
+&lt;h3 id=&#34;contour-plots:1d538ec01cc68949f4ab2ef62a40a650&#34;&gt;Contour Plots&lt;/h3&gt;
+
+&lt;p&gt;Lets take a detour to tackle some concepts specific to contour plots. A contour plot is a convenient way of representing higher dimensional data in lower dimensions. In a contour plot, a curve ( or contour ) shows all the values of \(x_1,x_2, \ldots, x_n\) for which the function \(f\) has the same value.&lt;/p&gt;
+
+&lt;p&gt;An interesting consequence of this is that the gradient of \(f\) is always going to be perpendicular to the contour lines. Most irritatingly this is always assumed as something that very obvious to everyone. If like me its not obvious to you on first reading, here is the reasoning.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;The gradient of a function at a point represents the direction of steepest increase at that point&lt;/li&gt;
+&lt;li&gt;Consider, that the gradient of \(f\) is NOT perpendicular to the contours&lt;/li&gt;
+&lt;li&gt;Then this means that there is a non-zero component of the gradient that lies along tangent to the contour at the point we are considering.&lt;/li&gt;
+&lt;li&gt;Which means that if we move in the direction of the tangent, the value of f should increase.&lt;/li&gt;
+&lt;li&gt;However, we are moving along the contour, where the value of \(f\) is the same throughout, clearly this is not possible and hence our assumption that the gradient is not perpendicular to the contour lines is wrong.&lt;/li&gt;
+&lt;li&gt;Thus, the gradient of \(f\) will always be perpendicular to the contour lines.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;inflating-balloons:1d538ec01cc68949f4ab2ef62a40a650&#34;&gt;Inflating Balloons&lt;/h3&gt;
+
+&lt;p&gt;Given a constraint \(g(x) = 0 \) generate its contour plot. Then for a given function \(f(x_1, x_2, \ldots, x_n) \colon \Re^{N} \rightarrow \Re\) imagine we start out the contour plot at its maxima. Then as we slowly expand out, initially the contour lines for \(f\) are completely inside the contour for \(g\). As we keep &amp;ldquo;inflating the balloon&amp;rdquo;, ( the surface of the ballon being an analogy for the contour lines ) there will come a point where we just touch the at one point the contour line for \(g\). Then we keep growing the balloon until, we arrive at a point where now the minor axis now touches the contour of \(g\) for the first time. These two points of intersection are the maxima and minima respectively.&lt;/p&gt;
+
+&lt;p&gt;At each of these two points, the two curves touch tangentially. Thus, we know that they share a common tangent, which means that their individual gradients are parallel to each other. Two lines perpendicular to the same line must be parallel to each other.&lt;/p&gt;
+
+&lt;p&gt;$$ \nabla f(x) = \lambda\nabla g(x) $$&lt;/p&gt;
+
+&lt;p&gt;Also, we know that the constraint must be satisfied so we also know that $$ g(x) = 0 $$&lt;/p&gt;
+
+&lt;p&gt;We can compactly represent both these equation ( and indeed any number of constraint equations can be incorporated ) by using the Lagrangian we for the above case is:&lt;/p&gt;
+
+&lt;p&gt;$$ \Lambda(x,\lambda) = f(x) - \lambda g(x) $$.&lt;/p&gt;
+
+&lt;p&gt;We can recover the two equations from the Lagrangian by asking for points that satisfy :&lt;/p&gt;
+
+&lt;p&gt;$$ \nabla \Lambda(x,\lambda) = 0 $$&lt;/p&gt;
+
+&lt;h3 id=&#34;concrete-example:1d538ec01cc68949f4ab2ef62a40a650&#34;&gt;Concrete Example&lt;/h3&gt;
+
+&lt;p&gt;$$ f(x_1, x_2 ) = 2 - x_1^{2} + 2x_2^{2} $$
+$$ g(x) = x_1^{2} + x_2^{2} - 1 = 0 $$&lt;/p&gt;
+
+&lt;p&gt;The lagrangian for this looks like:&lt;/p&gt;
+
+&lt;p&gt;$$ \Lambda(x,\lambda) = 2 -  x_1^{2} + 2x_2^{2}  -\lambda(x_1^{2} + x_2^{2} - 1) $$&lt;/p&gt;
+
+&lt;p&gt;Now we are interested in points where \( \nabla \Lambda(x,\lambda) = 0\). For this to be ture,each individual partial derivative is zero i:e&lt;/p&gt;
+
+&lt;p&gt;$$ \frac{\partial \Lambda(x,\lambda)}{\partial x_1} = -2x_1 - 2\lambda x_1 = 0 $$
+$$ \frac{\partial \Lambda(x,\lambda)}{\partial x_2} = 4x_2 - 2\lambda x_2 = 0 $$
+$$ \frac{\partial \Lambda(x,\lambda)}{\partial \lambda} =  x_1^{2} + x_2^{2} - 1 = 0$$&lt;/p&gt;
+
+&lt;p&gt;The first two equations recover the fact that the graients are parallel to each other, and the third equation recovers the fact that the constraint must be satisfied. Solving these three equations will result in the values of \(x_1 and x_2 \) that minimise or maximize ( depends on the value of lambda chosen ).&lt;/p&gt;
+
+&lt;p&gt;For example: From the first two equation we can surmise that \(\lambda \in \lbrace -1, -2\rbrace \). If \( \lambda = -1 \) then \(x_2 = 0\) and \(x_1 = \pm 1\). In which case \(f(x)\) = 1  which corresponds to a minima ( subject to the constraint ) and if \( \lambda = -2 \) then \(x_1 = 0\) and \(x_2 = \pm 1\). In which case \(f(x)\) = 4  which corresponds to a maxima.&lt;/p&gt;
+
+&lt;h3 id=&#34;final-thoughts:1d538ec01cc68949f4ab2ef62a40a650&#34;&gt;Final Thoughts&lt;/h3&gt;
+
+&lt;p&gt;The graphical visualization of the contour plot is very powerful and some careful consdieration leads us to the gradient condition of the function and the constraint, which is encapsulated in the Lagrangian. This can be extended to cover multiple equality constraints as well as a combination of equality and inequality constraints. These extensions may be discussed in a later post.&lt;/p&gt;
 </description>
     </item>
     

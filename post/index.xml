@@ -51,13 +51,13 @@
 
 &lt;p&gt;Given a constraint \(g(x) = 0 \) generate its contour plot. Then for a given function \(f(x_1, x_2, \ldots, x_n) \colon \Re^{N} \rightarrow \Re\) imagine we start out the contour plot at its maxima. Then as we slowly expand out, initially the contour lines for \(f\) are completely inside the contour for \(g\). As we keep &amp;ldquo;inflating the balloon&amp;rdquo;, ( the surface of the ballon being an analogy for the contour lines ) there will come a point where we just touch the at one point the contour line for \(g\). Then we keep growing the balloon until, we arrive at a point where now the minor axis now touches the contour of \(g\) for the first time. These two points of intersection are the maxima and minima respectively.&lt;/p&gt;
 
-&lt;p&gt;At each of these two points, the two curves touch tangentially. Thus, we know that they share a common tangent, which means that their individual gradients are parallel to each other. Two lines perpendicular to the same line must be parallel to each other.&lt;/p&gt;
+&lt;p&gt;At each of these two points, the two curves touch tangentially. Thus, we know that they share a common tangent, which means that their individual gradients are parallel to each other. Two lines perpendicular to the same line must be parallel to each other. Mathematically, it can be expressed as:&lt;/p&gt;
 
 &lt;p&gt;$$ \nabla f(x) = \lambda\nabla g(x) $$&lt;/p&gt;
 
 &lt;p&gt;Also, we know that the constraint must be satisfied so we also know that $$ g(x) = 0 $$&lt;/p&gt;
 
-&lt;p&gt;We can compactly represent both these equation ( and indeed any number of constraint equations can be incorporated ) by using the Lagrangian we for the above case is:&lt;/p&gt;
+&lt;p&gt;We can compactly represent both these equations ( and indeed any number of constraint equations can be incorporated ) by using the Lagrangian. For the above case it is:&lt;/p&gt;
 
 &lt;p&gt;$$ \Lambda(x,\lambda) = f(x) - \lambda g(x) $$.&lt;/p&gt;
 
@@ -70,7 +70,7 @@
 &lt;p&gt;$$ f(x_1, x_2 ) = 2 - x_1^{2} + 2x_2^{2} $$
 $$ g(x) = x_1^{2} + x_2^{2} - 1 = 0 $$&lt;/p&gt;
 
-&lt;p&gt;The lagrangian for this looks like:&lt;/p&gt;
+&lt;p&gt;The lagrangian for the above two equations looks like:&lt;/p&gt;
 
 &lt;p&gt;$$ \Lambda(x,\lambda) = 2 -  x_1^{2} + 2x_2^{2}  -\lambda(x_1^{2} + x_2^{2} - 1) $$&lt;/p&gt;
 
@@ -80,7 +80,7 @@ $$ g(x) = x_1^{2} + x_2^{2} - 1 = 0 $$&lt;/p&gt;
 $$ \frac{\partial \Lambda(x,\lambda)}{\partial x_2} = 4x_2 - 2\lambda x_2 = 0 $$
 $$ \frac{\partial \Lambda(x,\lambda)}{\partial \lambda} =  x_1^{2} + x_2^{2} - 1 = 0$$&lt;/p&gt;
 
-&lt;p&gt;The first two equations recover the fact that the graients are parallel to each other, and the third equation recovers the fact that the constraint must be satisfied. Solving these three equations will result in the values of \(x_1 and x_2 \) that minimise or maximize ( depends on the value of lambda chosen ).&lt;/p&gt;
+&lt;p&gt;The first two equations recover the fact that the graients are parallel to each other, and the third equation recovers the fact that the constraint must be satisfied. Solving these three equations will result in the values of \(x_1\) and \(x_2 \) that minimise or maximize ( depends on the value of lambda chosen ).&lt;/p&gt;
 
 &lt;p&gt;For example: From the first two equation we can surmise that \(\lambda \in \lbrace -1, -2\rbrace \). If \( \lambda = -1 \) then \(x_2 = 0\) and \(x_1 = \pm 1\). In which case \(f(x)\) = 1  which corresponds to a minima ( subject to the constraint ) and if \( \lambda = -2 \) then \(x_1 = 0\) and \(x_2 = \pm 1\). In which case \(f(x)\) = 4  which corresponds to a maxima.&lt;/p&gt;
 

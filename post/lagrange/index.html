@@ -13,16 +13,16 @@
   
   <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
   
-  <link rel="stylesheet" href="http://localhost:1313//css/fonts.css">
-  <link rel="stylesheet" href="http://localhost:1313//css/normalize.css">
-  <link rel="stylesheet" href="http://localhost:1313//css/skeleton.css">
-  <link rel="stylesheet" href="http://localhost:1313//css/custom.css">
+  <link rel="stylesheet" href="http://joshishantanu.com//css/fonts.css">
+  <link rel="stylesheet" href="http://joshishantanu.com//css/normalize.css">
+  <link rel="stylesheet" href="http://joshishantanu.com//css/skeleton.css">
+  <link rel="stylesheet" href="http://joshishantanu.com//css/custom.css">
 
   
   
-  <link rel="stylesheet" href="http://localhost:1313//highlight/styles/default.css">
+  <link rel="stylesheet" href="http://joshishantanu.com//highlight/styles/default.css">
   
-  <script src="http://localhost:1313//highlight/highlight.pack.js"></script>
+  <script src="http://joshishantanu.com//highlight/highlight.pack.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
 </head>
@@ -41,8 +41,8 @@
 	  <div class="eight columns offset-by-two">
 		<ul class="">
 		  
-		  <li class="u-pull-left"> <a href="http://localhost:1313/" class="brand" style="font-weight:bold;font-size:normal"> Shantanu Joshi </a></li>
-		  <li class="u-pull-right cate"> <a href="http://localhost:1313//about/" class=""> About </a></li>
+		  <li class="u-pull-left"> <a href="http://joshishantanu.com/" class="brand" style="font-weight:bold;font-size:normal"> Shantanu Joshi </a></li>
+		  <li class="u-pull-right cate"> <a href="http://joshishantanu.com//about/" class=""> About </a></li>
 		  
 		</ul>
 	  </div>
@@ -104,11 +104,44 @@
 
 <h3 id="inflating-balloons:1d538ec01cc68949f4ab2ef62a40a650">Inflating Balloons</h3>
 
-<p>This is an example of inline mathematic \(\Re\)</p>
+<p>Given a constraint \(g(x) = 0 \) generate its contour plot. Then for a given function \(f(x_1, x_2, \ldots, x_n) \colon \Re^{N} \rightarrow \Re\) imagine we start out the contour plot at its maxima. Then as we slowly expand out, initially the contour lines for \(f\) are completely inside the contour for \(g\). As we keep &ldquo;inflating the balloon&rdquo;, ( the surface of the ballon being an analogy for the contour lines ) there will come a point where we just touch the at one point the contour line for \(g\). Then we keep growing the balloon until, we arrive at a point where now the minor axis now touches the contour of \(g\) for the first time. These two points of intersection are the maxima and minima respectively.</p>
 
-<p>This is on a line of its own:</p>
+<p>At each of these two points, the two curves touch tangentially. Thus, we know that they share a common tangent, which means that their individual gradients are parallel to each other. Two lines perpendicular to the same line must be parallel to each other.</p>
 
-<p>$$ \nabla $$</p>
+<p>$$ \nabla f(x) = \lambda\nabla g(x) $$</p>
+
+<p>Also, we know that the constraint must be satisfied so we also know that $$ g(x) = 0 $$</p>
+
+<p>We can compactly represent both these equation ( and indeed any number of constraint equations can be incorporated ) by using the Lagrangian we for the above case is:</p>
+
+<p>$$ \Lambda(x,\lambda) = f(x) - \lambda g(x) $$.</p>
+
+<p>We can recover the two equations from the Lagrangian by asking for points that satisfy :</p>
+
+<p>$$ \nabla \Lambda(x,\lambda) = 0 $$</p>
+
+<h3 id="concrete-example:1d538ec01cc68949f4ab2ef62a40a650">Concrete Example</h3>
+
+<p>$$ f(x_1, x_2 ) = 2 - x_1^{2} + 2x_2^{2} $$
+$$ g(x) = x_1^{2} + x_2^{2} - 1 = 0 $$</p>
+
+<p>The lagrangian for this looks like:</p>
+
+<p>$$ \Lambda(x,\lambda) = 2 -  x_1^{2} + 2x_2^{2}  -\lambda(x_1^{2} + x_2^{2} - 1) $$</p>
+
+<p>Now we are interested in points where \( \nabla \Lambda(x,\lambda) = 0\). For this to be ture,each individual partial derivative is zero i:e</p>
+
+<p>$$ \frac{\partial \Lambda(x,\lambda)}{\partial x_1} = -2x_1 - 2\lambda x_1 = 0 $$
+$$ \frac{\partial \Lambda(x,\lambda)}{\partial x_2} = 4x_2 - 2\lambda x_2 = 0 $$
+$$ \frac{\partial \Lambda(x,\lambda)}{\partial \lambda} =  x_1^{2} + x_2^{2} - 1 = 0$$</p>
+
+<p>The first two equations recover the fact that the graients are parallel to each other, and the third equation recovers the fact that the constraint must be satisfied. Solving these three equations will result in the values of \(x_1 and x_2 \) that minimise or maximize ( depends on the value of lambda chosen ).</p>
+
+<p>For example: From the first two equation we can surmise that \(\lambda \in \lbrace -1, -2\rbrace \). If \( \lambda = -1 \) then \(x_2 = 0\) and \(x_1 = \pm 1\). In which case \(f(x)\) = 1  which corresponds to a minima ( subject to the constraint ) and if \( \lambda = -2 \) then \(x_1 = 0\) and \(x_2 = \pm 1\). In which case \(f(x)\) = 4  which corresponds to a maxima.</p>
+
+<h3 id="final-thoughts:1d538ec01cc68949f4ab2ef62a40a650">Final Thoughts</h3>
+
+<p>The graphical visualization of the contour plot is very powerful and some careful consdieration leads us to the gradient condition of the function and the constraint, which is encapsulated in the Lagrangian. This can be extended to cover multiple equality constraints as well as a combination of equality and inequality constraints. These extensions may be discussed in a later post.</p>
 
 	  </div>
 	</div>
@@ -144,8 +177,8 @@
 </div>
 
 
-<script src="http://localhost:1313//js/jquery.min.js" type="text/javascript"></script>
-<script src="http://localhost:1313//js/jquery.timeago.js" type="text/javascript"></script>
+<script src="http://joshishantanu.com//js/jquery.min.js" type="text/javascript"></script>
+<script src="http://joshishantanu.com//js/jquery.timeago.js" type="text/javascript"></script>
 <script type="text/javascript">
   $(function(){
     $("time.timeago").timeago();
@@ -167,9 +200,6 @@
 </script>
 
 
-<script>document.write('<script src="http://'
-        + (location.host || 'localhost').split(':')[0]
-		+ ':1313/livereload.js?mindelay=10"></'
-        + 'script>')</script></body>
+</body>
 </html>
 

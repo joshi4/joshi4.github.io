@@ -418,11 +418,9 @@ fmt.Println(slice)
       <pubDate>Tue, 17 Jun 2014 04:20:23 +0000</pubDate>
       
       <guid>http://joshishantanu.com/about/</guid>
-      <description>&lt;p&gt;Afer completing my undergraduate studies from Purdue, I am currently pursuing my Master&amp;rsquo;s in Computer Science at Stanford.&lt;/p&gt;
+      <description>&lt;p&gt;I am currently a software engineer at SalesforceIQ and have previously interned at Qualcomm, ZOHO and CoreOS. I completed my Master in Computer Science from Stanford and Bachelors in Computer Engineering from Purdue.&lt;/p&gt;
 
-&lt;p&gt;I have previously interned at Qualcomm, ZOHO and CoreOS.&lt;/p&gt;
-
-&lt;p&gt;Feel free to contact me at: &lt;code&gt;joshi4 AT stanford DOT edu&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Feel free to contact me at: &lt;code&gt;joshi4 AT alumni DOT stanford DOT edu&lt;/code&gt;&lt;/p&gt;
 </description>
     </item>
     

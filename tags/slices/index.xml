@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Slices on Shantanu Joshi</title>
-    <link>http://joshishantanu.com/tags/slices/</link>
+    <link>http://localhost:1313/tags/slices/</link>
     <description>Recent content in Slices on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
     <lastBuildDate>Mon, 21 Jul 2014 04:21:44 +0000</lastBuildDate>
-    <atom:link href="http://joshishantanu.com/tags/slices/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/tags/slices/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Small Gotcha in Go slices</title>
-      <link>http://joshishantanu.com/post/slices/</link>
+      <link>http://localhost:1313/post/slices/</link>
       <pubDate>Mon, 21 Jul 2014 04:21:44 +0000</pubDate>
       
-      <guid>http://joshishantanu.com/post/slices/</guid>
+      <guid>http://localhost:1313/post/slices/</guid>
       <description>&lt;p&gt;I am back to writing programs in Go after almost a year. Today, I ran into an issue at work that led me to re-read some important docs and revisit the fundamentals of slices in Go.&lt;/p&gt;
 
 &lt;p&gt;The issue is best explained using the ( representative )code below:&lt;/p&gt;

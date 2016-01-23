@@ -2,48 +2,53 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://joshishantanu.com/</loc>
-    <lastmod>2015-04-10T15:28:04-07:00</lastmod>
+    <loc>http://localhost:1313/</loc>
+    <lastmod>2016-01-23T13:38:19-08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/lagrange/</loc>
+    <loc>http://localhost:1313/post/sudoku/</loc>
+    <lastmod>2016-01-23T13:38:19-08:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://localhost:1313/post/lagrange/</loc>
     <lastmod>2015-04-10T15:28:04-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/eraser/</loc>
+    <loc>http://localhost:1313/post/eraser/</loc>
     <lastmod>2015-04-02T18:33:10-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/worse_better/</loc>
+    <loc>http://localhost:1313/post/worse_better/</loc>
     <lastmod>2015-04-02T00:33:10-07:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/cryptolearnings/</loc>
+    <loc>http://localhost:1313/post/cryptolearnings/</loc>
     <lastmod>2014-08-01T04:21:23+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/slices/</loc>
+    <loc>http://localhost:1313/post/slices/</loc>
     <lastmod>2014-07-21T04:21:44+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/sceptical/</loc>
+    <loc>http://localhost:1313/post/sceptical/</loc>
     <lastmod>2014-07-20T07:44:42+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/post/first/</loc>
+    <loc>http://localhost:1313/post/first/</loc>
     <lastmod>2014-06-17T04:21:44+00:00</lastmod>
   </url>
   
   <url>
-    <loc>http://joshishantanu.com/about/</loc>
+    <loc>http://localhost:1313/about/</loc>
     <lastmod>2014-06-17T04:20:23+00:00</lastmod>
   </url>
   

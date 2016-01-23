@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Optimization on Shantanu Joshi</title>
-    <link>http://localhost:1313/tags/optimization/</link>
+    <link>http://joshishantanu.com:1313/tags/optimization/</link>
     <description>Recent content in Optimization on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
     <lastBuildDate>Fri, 10 Apr 2015 15:28:04 -0700</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/optimization/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://joshishantanu.com:1313/tags/optimization/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Lagrange Multiplier I</title>
-      <link>http://localhost:1313/post/lagrange/</link>
+      <link>http://joshishantanu.com:1313/post/lagrange/</link>
       <pubDate>Fri, 10 Apr 2015 15:28:04 -0700</pubDate>
       
-      <guid>http://localhost:1313/post/lagrange/</guid>
+      <guid>http://joshishantanu.com:1313/post/lagrange/</guid>
       <description>
 
 &lt;p&gt;I found an excellent writeup by Dan Klein explaining the intuition behind the &lt;a href=&#34;http://www.cs.berkeley.edu/~klein/papers/lagrange-multipliers.pdf&#34;&gt;Lagrange Multiplier&lt;/a&gt;. What follows is some notes for myself on the use of Lagrange Multipliers in the restricted case of equality constraints.&lt;/p&gt;

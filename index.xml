@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Shantanu Joshi</title>
-    <link>http://localhost:1313/</link>
+    <link>http://joshishantanu.com:1313/</link>
     <description>Recent content on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
     <lastBuildDate>Sat, 23 Jan 2016 13:38:19 -0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://joshishantanu.com:1313/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Using Go to Randomly Generate SudoKu</title>
-      <link>http://localhost:1313/post/sudoku/</link>
+      <link>http://joshishantanu.com:1313/post/sudoku/</link>
       <pubDate>Sat, 23 Jan 2016 13:38:19 -0800</pubDate>
       
-      <guid>http://localhost:1313/post/sudoku/</guid>
+      <guid>http://joshishantanu.com:1313/post/sudoku/</guid>
       <description>
 
 &lt;p&gt;I recently watched &lt;a href=&#34;https://www.youtube.com/watch?v=SmoM1InWXr0&#34;&gt;this&lt;/a&gt; talk by John Graham-Cumming titled: &lt;code&gt;A Channel Compendium&lt;/code&gt;. It has a lot of neat tricks like how to start all go-routines at the same time, how to kill all the go-routines instantly etc. I highly recommend watching it.&lt;/p&gt;
@@ -145,10 +145,10 @@ for i := 0; i &amp;lt; s.n; i++ {
     
     <item>
       <title>Lagrange Multiplier I</title>
-      <link>http://localhost:1313/post/lagrange/</link>
+      <link>http://joshishantanu.com:1313/post/lagrange/</link>
       <pubDate>Fri, 10 Apr 2015 15:28:04 -0700</pubDate>
       
-      <guid>http://localhost:1313/post/lagrange/</guid>
+      <guid>http://joshishantanu.com:1313/post/lagrange/</guid>
       <description>
 
 &lt;p&gt;I found an excellent writeup by Dan Klein explaining the intuition behind the &lt;a href=&#34;http://www.cs.berkeley.edu/~klein/papers/lagrange-multipliers.pdf&#34;&gt;Lagrange Multiplier&lt;/a&gt;. What follows is some notes for myself on the use of Lagrange Multipliers in the restricted case of equality constraints.&lt;/p&gt;
@@ -225,10 +225,10 @@ $$ \frac{\partial \Lambda(x,\lambda)}{\partial \lambda} =  x_1^{2} + x_2^{2} - 1
     
     <item>
       <title>Eraser: Data Race Detector</title>
-      <link>http://localhost:1313/post/eraser/</link>
+      <link>http://joshishantanu.com:1313/post/eraser/</link>
       <pubDate>Thu, 02 Apr 2015 18:33:10 -0700</pubDate>
       
-      <guid>http://localhost:1313/post/eraser/</guid>
+      <guid>http://joshishantanu.com:1313/post/eraser/</guid>
       <description>
 
 &lt;p&gt;Today, we discussed &lt;a href=&#34;http://cseweb.ucsd.edu/~savage/papers/Tocs97.pdf&#34;&gt;Eraser&lt;/a&gt;. It is essentially a tool to find data races in programs dynamically, i:e no static compile time checking.&lt;/p&gt;
@@ -276,10 +276,10 @@ unlock (m)            y += 1
     
     <item>
       <title>Worse is Better</title>
-      <link>http://localhost:1313/post/worse_better/</link>
+      <link>http://joshishantanu.com:1313/post/worse_better/</link>
       <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
       
-      <guid>http://localhost:1313/post/worse_better/</guid>
+      <guid>http://joshishantanu.com:1313/post/worse_better/</guid>
       <description>&lt;p&gt;I dropped into the CS240 lecture at Stanford this week and they were discussing &lt;a href=&#34;https://www.dreamsongs.com/RiseOfWorseIsBetter.html&#34;&gt;The Rise of Worse is Better&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;It is a  very short paper and infact not very technical at all barring one example.&lt;/p&gt;
@@ -292,10 +292,10 @@ unlock (m)            y += 1
     
     <item>
       <title>Crypto Learnings</title>
-      <link>http://localhost:1313/post/cryptolearnings/</link>
+      <link>http://joshishantanu.com:1313/post/cryptolearnings/</link>
       <pubDate>Fri, 01 Aug 2014 04:21:23 +0000</pubDate>
       
-      <guid>http://localhost:1313/post/cryptolearnings/</guid>
+      <guid>http://joshishantanu.com:1313/post/cryptolearnings/</guid>
       <description>
 
 &lt;p&gt;This past week, I had the opportunity to better understand some of the things that go on under the hood during an &lt;code&gt;ssh&lt;/code&gt; connection. Having never taken a crypto class at school, I started out with some background reading.&lt;/p&gt;
@@ -386,10 +386,10 @@ Are you sure you want to continue connecting (yes/no)? yes
     
     <item>
       <title>Small Gotcha in Go slices</title>
-      <link>http://localhost:1313/post/slices/</link>
+      <link>http://joshishantanu.com:1313/post/slices/</link>
       <pubDate>Mon, 21 Jul 2014 04:21:44 +0000</pubDate>
       
-      <guid>http://localhost:1313/post/slices/</guid>
+      <guid>http://joshishantanu.com:1313/post/slices/</guid>
       <description>&lt;p&gt;I am back to writing programs in Go after almost a year. Today, I ran into an issue at work that led me to re-read some important docs and revisit the fundamentals of slices in Go.&lt;/p&gt;
 
 &lt;p&gt;The issue is best explained using the ( representative )code below:&lt;/p&gt;
@@ -466,10 +466,10 @@ fmt.Println(slice)
     
     <item>
       <title>The Sceptical Patriot: Highlights</title>
-      <link>http://localhost:1313/post/sceptical/</link>
+      <link>http://joshishantanu.com:1313/post/sceptical/</link>
       <pubDate>Sun, 20 Jul 2014 07:44:42 +0000</pubDate>
       
-      <guid>http://localhost:1313/post/sceptical/</guid>
+      <guid>http://joshishantanu.com:1313/post/sceptical/</guid>
       <description>&lt;p&gt;I recently read &lt;a href=&#34;http://www.amazon.com/Sceptical-Patriot-Exploring-Truths-Glories-ebook/dp/B00K35G7ZO/ref=sr_1_1?ie=UTF8&amp;amp;qid=1404020995&amp;amp;sr=8-1&amp;amp;keywords=the+sceptical+patriot&#34;&gt;The Sceptical Patriot: Exploring the Truths Behind the Zero and Other Indian Glories &lt;/a&gt; and thought it was one of the best books I have read in the recent past. We&amp;rsquo;ve all been part of patriotic email chains ( when that was a thing) and now patriotic posts on Facebook extolling the greatness of our ancestors and their many path breaking contributions without which modern society would be lost.&lt;/p&gt;
 
 &lt;p&gt;This book takes an unvarnished look at some of the most famous and widely propogated India Facts and examines them through an unbiased lens backed by facts as best the author can find, which we learn throughout the book can be a suprisingly hard thing.&lt;/p&gt;
@@ -537,20 +537,20 @@ fmt.Println(slice)
     
     <item>
       <title>first</title>
-      <link>http://localhost:1313/post/first/</link>
+      <link>http://joshishantanu.com:1313/post/first/</link>
       <pubDate>Tue, 17 Jun 2014 04:21:44 +0000</pubDate>
       
-      <guid>http://localhost:1313/post/first/</guid>
+      <guid>http://joshishantanu.com:1313/post/first/</guid>
       <description>&lt;p&gt;&lt;em&gt;Hello&lt;/em&gt; &lt;strong&gt;World&lt;/strong&gt; &lt;code&gt;!!&lt;/code&gt;&lt;/p&gt;
 </description>
     </item>
     
     <item>
       <title>About</title>
-      <link>http://localhost:1313/about/</link>
+      <link>http://joshishantanu.com:1313/about/</link>
       <pubDate>Tue, 17 Jun 2014 04:20:23 +0000</pubDate>
       
-      <guid>http://localhost:1313/about/</guid>
+      <guid>http://joshishantanu.com:1313/about/</guid>
       <description>&lt;p&gt;I am currently a software engineer at SalesforceIQ and have previously interned at Qualcomm, ZOHO and CoreOS.&lt;/p&gt;
 
 &lt;p&gt;I completed my Masters in Computer Science from Stanford and Bachelors in Computer Engineering from Purdue.&lt;/p&gt;

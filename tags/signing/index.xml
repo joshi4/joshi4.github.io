@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Signing on Shantanu Joshi</title>
-    <link>http://joshishantanu.com:1313/tags/signing/</link>
+    <link>http://joshishantanu.com/tags/signing/</link>
     <description>Recent content in Signing on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
     <lastBuildDate>Fri, 01 Aug 2014 04:21:23 +0000</lastBuildDate>
-    <atom:link href="http://joshishantanu.com:1313/tags/signing/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://joshishantanu.com/tags/signing/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Crypto Learnings</title>
-      <link>http://joshishantanu.com:1313/post/cryptolearnings/</link>
+      <link>http://joshishantanu.com/post/cryptolearnings/</link>
       <pubDate>Fri, 01 Aug 2014 04:21:23 +0000</pubDate>
       
-      <guid>http://joshishantanu.com:1313/post/cryptolearnings/</guid>
+      <guid>http://joshishantanu.com/post/cryptolearnings/</guid>
       <description>
 
 &lt;p&gt;This past week, I had the opportunity to better understand some of the things that go on under the hood during an &lt;code&gt;ssh&lt;/code&gt; connection. Having never taken a crypto class at school, I started out with some background reading.&lt;/p&gt;

@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Paper on Shantanu Joshi</title>
-    <link>http://joshishantanu.com:1313/tags/paper/</link>
+    <link>http://joshishantanu.com/tags/paper/</link>
     <description>Recent content in Paper on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
     <lastBuildDate>Thu, 02 Apr 2015 00:33:10 -0700</lastBuildDate>
-    <atom:link href="http://joshishantanu.com:1313/tags/paper/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://joshishantanu.com/tags/paper/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Worse is Better</title>
-      <link>http://joshishantanu.com:1313/post/worse_better/</link>
+      <link>http://joshishantanu.com/post/worse_better/</link>
       <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
       
-      <guid>http://joshishantanu.com:1313/post/worse_better/</guid>
+      <guid>http://joshishantanu.com/post/worse_better/</guid>
       <description>&lt;p&gt;I dropped into the CS240 lecture at Stanford this week and they were discussing &lt;a href=&#34;https://www.dreamsongs.com/RiseOfWorseIsBetter.html&#34;&gt;The Rise of Worse is Better&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;It is a  very short paper and infact not very technical at all barring one example.&lt;/p&gt;

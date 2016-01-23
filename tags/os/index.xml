@@ -2,20 +2,20 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Os on Shantanu Joshi</title>
-    <link>http://joshishantanu.com:1313/tags/os/</link>
+    <link>http://joshishantanu.com/tags/os/</link>
     <description>Recent content in Os on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>(c) Shantanu Joshi 2015. Powered by hugo and theme is nofancy</copyright>
     <lastBuildDate>Thu, 02 Apr 2015 18:33:10 -0700</lastBuildDate>
-    <atom:link href="http://joshishantanu.com:1313/tags/os/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://joshishantanu.com/tags/os/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Eraser: Data Race Detector</title>
-      <link>http://joshishantanu.com:1313/post/eraser/</link>
+      <link>http://joshishantanu.com/post/eraser/</link>
       <pubDate>Thu, 02 Apr 2015 18:33:10 -0700</pubDate>
       
-      <guid>http://joshishantanu.com:1313/post/eraser/</guid>
+      <guid>http://joshishantanu.com/post/eraser/</guid>
       <description>
 
 &lt;p&gt;Today, we discussed &lt;a href=&#34;http://cseweb.ucsd.edu/~savage/papers/Tocs97.pdf&#34;&gt;Eraser&lt;/a&gt;. It is essentially a tool to find data races in programs dynamically, i:e no static compile time checking.&lt;/p&gt;
@@ -63,10 +63,10 @@ unlock (m)            y += 1
     
     <item>
       <title>Worse is Better</title>
-      <link>http://joshishantanu.com:1313/post/worse_better/</link>
+      <link>http://joshishantanu.com/post/worse_better/</link>
       <pubDate>Thu, 02 Apr 2015 00:33:10 -0700</pubDate>
       
-      <guid>http://joshishantanu.com:1313/post/worse_better/</guid>
+      <guid>http://joshishantanu.com/post/worse_better/</guid>
       <description>&lt;p&gt;I dropped into the CS240 lecture at Stanford this week and they were discussing &lt;a href=&#34;https://www.dreamsongs.com/RiseOfWorseIsBetter.html&#34;&gt;The Rise of Worse is Better&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;It is a  very short paper and infact not very technical at all barring one example.&lt;/p&gt;

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Introducing the uerrors package &middot; Shantanu Joshi</title>
+    <meta name="author" content="Shantanu Joshi">
+    <meta name="description" content="Golang">
+    <meta name="generator" content="Hugo 0.16" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="http://joshishantanu.com/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/2.1.2/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="http://joshishantanu.com/css/screen.css">
+    <link rel="stylesheet" href="http://joshishantanu.com/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/default.min.css">
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #33cc99;}
+    .pagination a {color: #33cc99;}
+    .gist .gist-file .gist-meta a:visited {color: #33cc99 !important;}
+    a:focus, a:hover {color: #178b6b;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #178b6b;}
+    .older-posts:hover, .newer-posts:hover {color: #178b6b;}
+</style>
+</head>
+
+<body class="post-template">
+
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="http://joshishantanu.com/">Shantanu Joshi</a></h1>
+	
+	
+</header>
+    
+<nav class="menu" role="nav">
+    <ul>
+        
+        	<li class="nav nav-current"><a href="/about/">About</a></li>
+      	
+        	<li class="nav nav-current"><a href="/reading/">Readings</a></li>
+      	
+    </ul>
+</nav>
+
+
+    <main class="content" role="main">
+	    <article class="post">
+	        <header>
+	        <h1 class="post-title">Introducing the uerrors package</h1>
+	        <div class="post-meta"><time datetime="30 November 2016">30 November 2016</time></div>
+	        </header>
+
+	        <section class="post-content">
+	            
+
+<p>Internal error messages are usually brief and in a format that is optimized for logging and searching.</p>
+
+<p>An example would be:</p>
+
+<pre><code class="language-sh">&gt; error=true, service=phantom, txid=12345, msg=&quot;user not authorized&quot;
+</code></pre>
+
+<p>While that&rsquo;s a great error message for developers to search by tags, its not a great error message to display to an end user.</p>
+
+<p>Usually, there&rsquo;s a translation layer that would take this error message and then return a more user friendly message to the end user. It might look something like:</p>
+
+<pre><code class="language-go">switch err:
+  case ErrInvalidUser:
+    umsg := &quot;You are not authorized to perform this action&quot;
+  default: 
+   umsg := err.Error()
+// send umsg down in a response body along with an appropriate statsCode 
+</code></pre>
+
+<p>It&rsquo;s often hard to find all the code paths and errors an API request could create and then individually, add them to a swtich statement.</p>
+
+<p>This is where <code>uerrors</code> comes in. It offers an easy interface to attach a user-friendly message while creating the original error itself.</p>
+
+<h2 id="usage">Usage</h2>
+
+<p>To create a New uerror</p>
+
+<pre><code class="language-go">
+err := uerrors.New(&quot;pkg: invalid token&quot;, &quot;Please renew your API token&quot;)
+</code></pre>
+
+<p>To create an uerror with values available only at run time:</p>
+
+<pre><code class="language-go">
+err := uerrors.FromErrors(fmt.Errorf(&quot;pkg: txnid=%s, resource=%s&quot;, txnid,resource), 
+                          fmt.Errorf(&quot;Your API request to %s failed. Please contact support if the issue persists&quot;, resource)) 
+</code></pre>
+
+<h2 id="constructing-an-user-friendly-response">Constructing an user friendly response:</h2>
+
+<pre><code class="language-go">package main
+
+import (
+	&quot;fmt&quot;
+	&quot;io&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+
+	&quot;github.com/joshi4/uerrors&quot;
+)
+
+func main() {
+	http.HandleFunc(&quot;/feature&quot;, serveFeature)
+	http.HandleFunc(&quot;/&quot;, serveIndex)
+	http.ListenAndServe(&quot;:6060&quot;, nil)
+}
+
+func serveIndex(w http.ResponseWriter, req *http.Request) {
+	uerr := uerrors.New(&quot;example: redirect failed&quot;, &quot;Please visit http://localhost:6060/feature if you aren't redirected automatically&quot;)
+	log.Println(uerr.Error())
+	io.WriteString(w, uerr.UserError())
+}
+
+func serveFeature(w http.ResponseWriter, req *http.Request) {
+	path := req.URL.Path
+	uerr := uerrors.FromErrors(fmt.Errorf(&quot;example: error=true, endpoint=%s&quot;, path),
+		fmt.Errorf(&quot;Please visit %s a little later&quot;, path))
+	log.Println(uerr.Error())
+	io.WriteString(w, uerr.UserError())
+}
+</code></pre>
+
+	        </section>
+
+	        <section class="post-tags" style="padding-bottom:60px;">
+	            <div class="post-meta tags">
+	            <i class="fa fa-fw fa-tag"></i>
+	            
+	            <a href="http://joshishantanu.com/tags/go">go </a>
+	            
+	            <a href="http://joshishantanu.com/tags/stdlib">stdlib </a>
+	            
+	            <a href="http://joshishantanu.com/tags/errors">errors </a>
+	            
+	            <a href="http://joshishantanu.com/tags/package">package </a>
+	            
+	            </div>
+	        </section>
+			
+			
+			
+			
+				<script src="https://apis.google.com/js/plusone.js">
+</script>
+<div class="g-comments"
+	data-href="http://joshishantanu.com/post/uerrors/"
+	data-width="600"
+	data-first_party_property="BLOGGER"
+	data-view_type="FILTERED_POSTMOD">
+</div>
+			
+
+	        <section class="share">
+	            <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+	            <p class="info prompt">Share</p>
+	            <a href="http://twitter.com/share?text=Introducing%20the%20uerrors%20package&url=http%3a%2f%2fjoshishantanu.com%2fpost%2fuerrors%2f" title="Share on Twitter"
+	                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+	                <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+	            </a>
+	            <a href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fjoshishantanu.com%2fpost%2fuerrors%2f" title="Share on Facebook"
+	                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+	                <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+	            </a>
+	            <a href="https://plus.google.com/share?url=http%3a%2f%2fjoshishantanu.com%2fpost%2fuerrors%2f" title="Share on Google+"
+	               onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+	                <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+	            </a>
+	        </section>
+
+	        <footer class="post-footer">
+	            <section class="author">
+    <div class="authorimage" style="background: url(http://joshishantanu.com/img/avatar.jpg)"></div>
+    <h4>Shantanu Joshi</h4>
+    <p class="bio"></p>
+    <p class="meta">
+      
+    </p>
+</section>
+	        </footer>
+	    </article>
+	</main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+			
+		    
+		    <a href="//github.com/joshi4" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+		    
+		    <a href="" target="_blank" title="RSS"><i class="fa fa-2x fa-fw fa-rss"></i> <span class="hidden">RSS</span></a>
+		</section>
+
+		<section class="copyright">&copy; 2016 <a href="http://joshishantanu.com/">Shantanu Joshi</a>. </section>
+	</div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://joshishantanu.com/js/index.js"></script>
+<script src="http://joshishantanu.com/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<!-- Google Analytics -->
+<script>
+  var _gaq=[['_setAccount','UA-82860549-1'],['_trackPageview']];
+  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+  g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+  s.parentNode.insertBefore(g,s)}(document,'script'));
+</script>
+
+
+</body>
+</html>

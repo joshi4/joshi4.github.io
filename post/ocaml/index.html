@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <title>Successfully Avoiding the syslog Package &middot; Shantanu Joshi</title>
+    <title>Getting Setup with Ocaml &middot; Shantanu Joshi</title>
     <meta name="author" content="Shantanu Joshi">
     <meta name="description" content="Golang">
     <meta name="generator" content="Hugo 0.16" />
@@ -57,58 +57,56 @@
     <main class="content" role="main">
 	    <article class="post">
 	        <header>
-	        <h1 class="post-title">Successfully Avoiding the syslog Package</h1>
-	        <div class="post-meta"><time datetime="02 July 2016">02 July 2016</time></div>
+	        <h1 class="post-title">Getting Setup with Ocaml</h1>
+	        <div class="post-meta"><time datetime="31 March 2017">31 March 2017</time></div>
 	        </header>
 
 	        <section class="post-content">
-	            <p>I recently, needed to ship logs from a service written in Go to <code>Papertrail</code>, our chosen log management tool.
-This seemed straightforward, use the built in <code>syslog</code> package to establish a connection to papertrail and use the <code>io.Writer</code> it returns as the output in the <code>logger</code>. This is where things got interesting.</p>
+	            
 
-<p>Before we go further, lets looks at what the above looks like in code:</p>
+<h2 id="prerequisite">PreRequisite</h2>
 
-<pre><code class="language-go">import (
-	&quot;io&quot;
-	&quot;log&quot;
-	&quot;log/syslog&quot;
-	&quot;os&quot;
-)
+<p>This post assumes you have spacemacs already installed.</p>
 
-func main() {
-	sw, err := syslog.Dial(&quot;tcp&quot;, &quot;&lt;host&gt;.papertrailapp.com:&lt;port&quot;, 0, &quot;tag&quot;)
-	if err == nil {
-		// log to stderr and ship to papertrail
-		log.SetOutput(io.MultiWriter(sw, os.Stderr))
-	} else {
-		log.Println(err)
-	}
-	// continue with logging as ussual ....
-}
+<h2 id="install-ocaml">Install Ocaml</h2>
+
+<p>Follow the installation <a href="https://github.com/realworldocaml/book/wiki/Installation-Instructions">instructions</a> from <code>RealWorldOcaml</code> till you hit the <code>Editors</code> section</p>
+
+<p>After this step you should have a working installation of
+* ocaml
+* opam ( the package manager)
+* merlin
+* ocamllint
+* utop</p>
+
+<p>The contents of <code>~/.ocamllint</code> should be very close to:</p>
+
+<pre><code class="language-sh">## Setting up spacemacs
+(* Added by OPAM. *)
+let () =
+  try Topdirs.dir_directory (Sys.getenv &quot;OCAML_TOPLEVEL_PATH&quot;)
+  with Not_found -&gt; ()
+;;
+(* Manually Added*)
+#use &quot;topfind&quot;;;
+#thread;;
+#camlp4o;;
+#require &quot;core.top&quot;;;
+#require &quot;core.syntax&quot;;;
 </code></pre>
 
-<p>Surprisingly, the above program did not work. <code>syslog.Dial</code> reported no errors, logs were output to <code>Stderr</code>, but no logs showed up in papertrail.</p>
+<h2 id="project-setup">Project setup</h2>
 
-<p>After some fiddling I decided to change the protocol to <code>udp</code>. This worked without any problems. Okay, so now that I knew that the problem was somehow with the <code>tcp</code> connection that made things a lot easiser. I quickly, realized that we had set papertrail to only accept tcp connections that are secured with <code>tls</code>.</p>
+<p>Ensure there is a <code>.merlin</code> file in the same directory as your <code>hello.ml</code> file.</p>
 
-<p>Digging into the source for the <code>syslog</code> pacakge I found that <code>syslog.Dial</code> estabilishes a connetion with the remote syslog machine via <code>net.Dial</code> and not <code>tls.Dial</code>. Great!, this seems like an opportunity to fix the issue with an upstream patch right ? No! the syslog package is no longer under active developement :(</p>
+<p>The contents of the <code>.merlin</code> file should be:</p>
 
-<p>My colleague pointed me to <a href="https://github.com/RackSec/srslo://github.com/RackSec/srslog">srslog</a> which fixes exactly this issue. However, it seemed like a very large dependency to bring in just to ship logs to papertrail. By this point I had become familiar with the <code>syslog</code> package and realized that essentially, we were establishing a connection and writing bytes to it. That seems easy ! Why did I need to bring in a large dependency to do that when I can just as easily do this:</p>
-
-<pre><code class="language-go">func main() {
-  sw, err := tls.Dial(&quot;tcp&quot;, &quot;&lt;host&gt;.papertrailapp.com:port&quot;, nil)
-	if err == nil {
-		// log to stderr and ship to papertrail
-		log.SetOutput(io.MultiWriter(sw, os.Stderr))
-	} else {
-		log.Println(err)
-	}
-	// continue with logging as ussual ....
-}
+<pre><code class="language-sh">PKG core lwt
 </code></pre>
 
-<p>Now, this worked for us because, we didn&rsquo;t care about the log priority that you can provide into syslog package and the tag can easily be replaced by setting a <code>Prefix</code> in the logger.</p>
+<p>This <a href="https://github.com/ocaml/merlin/wiki/emacs-from-scratch#using-libraries">doc</a> explains why that statement is needed.</p>
 
-<p>The code ends up being simpler and avoids bringing in a large dependency.</p>
+<p>That&rsquo;s it! now you can open spacemacs and enjoy a full featured IDE experience for ocaml.</p>
 
 	        </section>
 
@@ -116,13 +114,15 @@ func main() {
 	            <div class="post-meta tags">
 	            <i class="fa fa-fw fa-tag"></i>
 	            
-	            <a href="http://joshishantanu.com/tags/go">go </a>
+	            <a href="http://joshishantanu.com/tags/ocaml">ocaml </a>
 	            
-	            <a href="http://joshishantanu.com/tags/stdlib">stdlib </a>
+	            <a href="http://joshishantanu.com/tags/setup">setup </a>
 	            
-	            <a href="http://joshishantanu.com/tags/dependency">dependency </a>
+	            <a href="http://joshishantanu.com/tags/merlin">merlin </a>
 	            
-	            <a href="http://joshishantanu.com/tags/syslog">syslog </a>
+	            <a href="http://joshishantanu.com/tags/ocamllint">ocamllint </a>
+	            
+	            <a href="http://joshishantanu.com/tags/spacemacs">spacemacs </a>
 	            
 	            </div>
 	        </section>
@@ -133,7 +133,7 @@ func main() {
 				<script src="https://apis.google.com/js/plusone.js">
 </script>
 <div class="g-comments"
-	data-href="http://joshishantanu.com/post/syslog/"
+	data-href="http://joshishantanu.com/post/ocaml/"
 	data-width="600"
 	data-first_party_property="BLOGGER"
 	data-view_type="FILTERED_POSTMOD">
@@ -143,15 +143,15 @@ func main() {
 	        <section class="share">
 	            <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
 	            <p class="info prompt">Share</p>
-	            <a href="http://twitter.com/share?text=Successfully%20Avoiding%20the%20syslog%20Package&url=http%3a%2f%2fjoshishantanu.com%2fpost%2fsyslog%2f" title="Share on Twitter"
+	            <a href="http://twitter.com/share?text=Getting%20Setup%20with%20Ocaml&url=http%3a%2f%2fjoshishantanu.com%2fpost%2focaml%2f" title="Share on Twitter"
 	                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
 	                <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
 	            </a>
-	            <a href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fjoshishantanu.com%2fpost%2fsyslog%2f" title="Share on Facebook"
+	            <a href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fjoshishantanu.com%2fpost%2focaml%2f" title="Share on Facebook"
 	                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
 	                <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
 	            </a>
-	            <a href="https://plus.google.com/share?url=http%3a%2f%2fjoshishantanu.com%2fpost%2fsyslog%2f" title="Share on Google+"
+	            <a href="https://plus.google.com/share?url=http%3a%2f%2fjoshishantanu.com%2fpost%2focaml%2f" title="Share on Google+"
 	               onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
 	                <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
 	            </a>

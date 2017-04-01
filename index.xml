@@ -6,8 +6,62 @@
     <description>Recent content on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 30 Nov 2016 21:25:19 -0800</lastBuildDate>
+    <lastBuildDate>Fri, 31 Mar 2017 21:05:39 -0700</lastBuildDate>
     <atom:link href="http://joshishantanu.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Getting Setup with Ocaml</title>
+      <link>http://joshishantanu.com/post/ocaml/</link>
+      <pubDate>Fri, 31 Mar 2017 21:05:39 -0700</pubDate>
+      
+      <guid>http://joshishantanu.com/post/ocaml/</guid>
+      <description>
+
+&lt;h2 id=&#34;prerequisite&#34;&gt;PreRequisite&lt;/h2&gt;
+
+&lt;p&gt;This post assumes you have spacemacs already installed.&lt;/p&gt;
+
+&lt;h2 id=&#34;install-ocaml&#34;&gt;Install Ocaml&lt;/h2&gt;
+
+&lt;p&gt;Follow the installation &lt;a href=&#34;https://github.com/realworldocaml/book/wiki/Installation-Instructions&#34;&gt;instructions&lt;/a&gt; from &lt;code&gt;RealWorldOcaml&lt;/code&gt; till you hit the &lt;code&gt;Editors&lt;/code&gt; section&lt;/p&gt;
+
+&lt;p&gt;After this step you should have a working installation of
+* ocaml
+* opam ( the package manager)
+* merlin
+* ocamllint
+* utop&lt;/p&gt;
+
+&lt;p&gt;The contents of &lt;code&gt;~/.ocamllint&lt;/code&gt; should be very close to:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;## Setting up spacemacs
+(* Added by OPAM. *)
+let () =
+  try Topdirs.dir_directory (Sys.getenv &amp;quot;OCAML_TOPLEVEL_PATH&amp;quot;)
+  with Not_found -&amp;gt; ()
+;;
+(* Manually Added*)
+#use &amp;quot;topfind&amp;quot;;;
+#thread;;
+#camlp4o;;
+#require &amp;quot;core.top&amp;quot;;;
+#require &amp;quot;core.syntax&amp;quot;;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;project-setup&#34;&gt;Project setup&lt;/h2&gt;
+
+&lt;p&gt;Ensure there is a &lt;code&gt;.merlin&lt;/code&gt; file in the same directory as your &lt;code&gt;hello.ml&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;p&gt;The contents of the &lt;code&gt;.merlin&lt;/code&gt; file should be:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;PKG core lwt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This &lt;a href=&#34;https://github.com/ocaml/merlin/wiki/emacs-from-scratch#using-libraries&#34;&gt;doc&lt;/a&gt; explains why that statement is needed.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it! now you can open spacemacs and enjoy a full featured IDE experience for ocaml.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Introducing the uerrors package</title>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>TLS Handshake Timeouts in Go &middot; Shantanu Joshi</title>
+    <meta name="author" content="Shantanu Joshi">
+    <meta name="description" content="Golang">
+    <meta name="generator" content="Hugo 0.16" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="http://joshishantanu.com/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/2.1.2/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="http://joshishantanu.com/css/screen.css">
+    <link rel="stylesheet" href="http://joshishantanu.com/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/default.min.css">
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #33cc99;}
+    .pagination a {color: #33cc99;}
+    .gist .gist-file .gist-meta a:visited {color: #33cc99 !important;}
+    a:focus, a:hover {color: #178b6b;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #178b6b;}
+    .older-posts:hover, .newer-posts:hover {color: #178b6b;}
+</style>
+</head>
+
+<body class="post-template">
+
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="http://joshishantanu.com/">Shantanu Joshi</a></h1>
+	
+	
+</header>
+    
+<nav class="menu" role="nav">
+    <ul>
+        
+        	<li class="nav nav-current"><a href="/about/">About</a></li>
+      	
+        	<li class="nav nav-current"><a href="/reading/">Readings</a></li>
+      	
+    </ul>
+</nav>
+
+
+    <main class="content" role="main">
+	    <article class="post">
+	        <header>
+	        <h1 class="post-title">TLS Handshake Timeouts in Go</h1>
+	        <div class="post-meta"><time datetime="26 May 2017">26 May 2017</time></div>
+	        </header>
+
+	        <section class="post-content">
+	            
+
+<p>I recently came across a situation where a Go program (built with go1.8.3) had spawned a lot more goroutines than required. Profiling revealed the cause to be go routines blocked on reading from a client while negotiating the TLS handshake. The goroutine stack trace led me to the following code segment in <code>crypto/tls</code>:</p>
+
+<pre><code class="language-go">// File: cryto/tls/conn.go
+// Line: 589 (go1.8.3)
+
+// Read header, payload.
+// recordHeaderLen is a global variable set to 5
+if err := b.readFromUntil(c.conn, recordHeaderLen); err != nil {
+</code></pre>
+
+<p>A server side goroutine could be stuck here for a long time if the client doesn&rsquo;t write anything to the wire. Clearly, the fix is to set a <code>TLSHandshakeTimeout</code> on  <code>http.Server</code>. Just one problem, there&rsquo;s no such setting.</p>
+
+<p><code>http.Server</code> exposes a <code>ReadTimeout</code> and a <code>ReadHeaderTimeout</code>. The latter applies only after a TLS handshake has been completed successfully and does not help our cause. The former, would definitely fix our problem, but it comes with a caveat. The entire request Body must be read within the <code>ReadTimeout</code>, meaning we cannot stream large request bodies.</p>
+
+<h2 id="indirect-tlshandshaketimeout">Indirect TLSHandshakeTimeout</h2>
+
+<p><code>http.Server</code> exposes a callback <code>ConnState</code> which fits our needs perfectly, i:e allows us to terminate connections stuck during a TLS handshake but still support streaming large request bodies.</p>
+
+<pre><code class="language-go">	// ConnState specifies an optional callback function that is
+	// called when a client connection changes state. See the
+	// ConnState type and associated constants for details.
+	ConnState func(net.Conn, ConnState)
+</code></pre>
+
+<p>ConnState is called for the <a href="https://github.com/golang/go/blob/release-branch.go1.8/src/net/http/server.go#L2667">first</a> time immediately after <code>Accept</code>. The ConnState at this point is <code>StateNew</code>.</p>
+
+<p>The <a href="https://github.com/golang/go/blob/release-branch.go1.8/src/net/http/server.go#L1766">next time</a> it is called is when the server has read atleast one byte of the request. The ConnState is now <code>StateActive</code>.</p>
+
+<p>Inbetween these state transistions, the server has, if required, negotiated the TLS handshake. If a <code>ReadDeadline</code> is set on the conn immediately after it enters <code>StateNew</code> it is only overriden by the <code>ReadHeaderTimeout</code> when the server attempts to <a href="https://github.com/golang/go/blob/release-branch.go1.8/src/net/http/server.go#L915">read the request</a>. Thus, the only meaningful activity carried out the Server after setting the custom <code>ReadDeadline</code> is the TLSHandshake. I&rsquo;ve included the code for this below:</p>
+
+<pre><code class="language-go">var TLSHandshakeTimeout = 30 * time.Second // very generous timeout
+
+s := &amp;http.Server{
+  ReadHeaderTimeout: 1 * time.Minute, 
+  ConnState: func(conn net.Conn, cs ConnState){
+    switch cs{
+      case StateNew:
+      conn.SetReadDeadline(time.Now().Add(TLSHandshakeTimeout))
+      default:
+      // NOTE: this is a good place to track connection level metrics :)
+    }
+  }, 
+}
+</code></pre>
+
+<h3 id="resources">Resources</h3>
+
+<p>Cloudflare has a great <a href="https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/">blog post</a> on timeouts in http that I found very helpful while researching solutions for this problem.</p>
+
+	        </section>
+
+	        <section class="post-tags" style="padding-bottom:60px;">
+	            <div class="post-meta tags">
+	            <i class="fa fa-fw fa-tag"></i>
+	            
+	            <a href="http://joshishantanu.com/tags/go">go </a>
+	            
+	            <a href="http://joshishantanu.com/tags/tls">tls </a>
+	            
+	            <a href="http://joshishantanu.com/tags/timeout">timeout </a>
+	            
+	            <a href="http://joshishantanu.com/tags/http">http </a>
+	            
+	            <a href="http://joshishantanu.com/tags/pprof">pprof </a>
+	            
+	            </div>
+	        </section>
+			
+			
+			
+			
+				<script src="https://apis.google.com/js/plusone.js">
+</script>
+<div class="g-comments"
+	data-href="http://joshishantanu.com/post/timeout/"
+	data-width="600"
+	data-first_party_property="BLOGGER"
+	data-view_type="FILTERED_POSTMOD">
+</div>
+			
+
+	        <section class="share">
+	            <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+	            <p class="info prompt">Share</p>
+	            <a href="http://twitter.com/share?text=TLS%20Handshake%20Timeouts%20in%20Go&url=http%3a%2f%2fjoshishantanu.com%2fpost%2ftimeout%2f" title="Share on Twitter"
+	                onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+	                <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+	            </a>
+	            <a href="https://www.facebook.com/sharer/sharer.php?u=http%3a%2f%2fjoshishantanu.com%2fpost%2ftimeout%2f" title="Share on Facebook"
+	                onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+	                <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+	            </a>
+	            <a href="https://plus.google.com/share?url=http%3a%2f%2fjoshishantanu.com%2fpost%2ftimeout%2f" title="Share on Google+"
+	               onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+	                <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+	            </a>
+	        </section>
+
+	        <footer class="post-footer">
+	            <section class="author">
+    <div class="authorimage" style="background: url(http://joshishantanu.com/img/avatar.jpg)"></div>
+    <h4>Shantanu Joshi</h4>
+    <p class="bio"></p>
+    <p class="meta">
+      
+    </p>
+</section>
+	        </footer>
+	    </article>
+	</main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+			
+		    
+		    <a href="//github.com/joshi4" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+		    
+		    <a href="" target="_blank" title="RSS"><i class="fa fa-2x fa-fw fa-rss"></i> <span class="hidden">RSS</span></a>
+		</section>
+
+		<section class="copyright">&copy; 2017 <a href="http://joshishantanu.com/">Shantanu Joshi</a>. </section>
+	</div>
+</footer>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="http://joshishantanu.com/js/index.js"></script>
+<script src="http://joshishantanu.com/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+<!-- Google Analytics -->
+<script>
+  var _gaq=[['_setAccount','UA-82860549-1'],['_trackPageview']];
+  (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+  g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+  s.parentNode.insertBefore(g,s)}(document,'script'));
+</script>
+
+
+</body>
+</html>

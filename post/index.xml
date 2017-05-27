@@ -6,8 +6,67 @@
     <description>Recent content in Posts on Shantanu Joshi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 31 Mar 2017 21:05:39 -0700</lastBuildDate>
+    <lastBuildDate>Fri, 26 May 2017 21:09:44 -0700</lastBuildDate>
     <atom:link href="http://joshishantanu.com/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>TLS Handshake Timeouts in Go</title>
+      <link>http://joshishantanu.com/post/timeout/</link>
+      <pubDate>Fri, 26 May 2017 21:09:44 -0700</pubDate>
+      
+      <guid>http://joshishantanu.com/post/timeout/</guid>
+      <description>
+
+&lt;p&gt;I recently came across a situation where a Go program (built with go1.8.3) had spawned a lot more goroutines than required. Profiling revealed the cause to be go routines blocked on reading from a client while negotiating the TLS handshake. The goroutine stack trace led me to the following code segment in &lt;code&gt;crypto/tls&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// File: cryto/tls/conn.go
+// Line: 589 (go1.8.3)
+
+// Read header, payload.
+// recordHeaderLen is a global variable set to 5
+if err := b.readFromUntil(c.conn, recordHeaderLen); err != nil {
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A server side goroutine could be stuck here for a long time if the client doesn&amp;rsquo;t write anything to the wire. Clearly, the fix is to set a &lt;code&gt;TLSHandshakeTimeout&lt;/code&gt; on  &lt;code&gt;http.Server&lt;/code&gt;. Just one problem, there&amp;rsquo;s no such setting.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;http.Server&lt;/code&gt; exposes a &lt;code&gt;ReadTimeout&lt;/code&gt; and a &lt;code&gt;ReadHeaderTimeout&lt;/code&gt;. The latter applies only after a TLS handshake has been completed successfully and does not help our cause. The former, would definitely fix our problem, but it comes with a caveat. The entire request Body must be read within the &lt;code&gt;ReadTimeout&lt;/code&gt;, meaning we cannot stream large request bodies.&lt;/p&gt;
+
+&lt;h2 id=&#34;indirect-tlshandshaketimeout&#34;&gt;Indirect TLSHandshakeTimeout&lt;/h2&gt;
+
+&lt;p&gt;&lt;code&gt;http.Server&lt;/code&gt; exposes a callback &lt;code&gt;ConnState&lt;/code&gt; which fits our needs perfectly, i:e allows us to terminate connections stuck during a TLS handshake but still support streaming large request bodies.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;	// ConnState specifies an optional callback function that is
+	// called when a client connection changes state. See the
+	// ConnState type and associated constants for details.
+	ConnState func(net.Conn, ConnState)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ConnState is called for the &lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/net/http/server.go#L2667&#34;&gt;first&lt;/a&gt; time immediately after &lt;code&gt;Accept&lt;/code&gt;. The ConnState at this point is &lt;code&gt;StateNew&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/net/http/server.go#L1766&#34;&gt;next time&lt;/a&gt; it is called is when the server has read atleast one byte of the request. The ConnState is now &lt;code&gt;StateActive&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Inbetween these state transistions, the server has, if required, negotiated the TLS handshake. If a &lt;code&gt;ReadDeadline&lt;/code&gt; is set on the conn immediately after it enters &lt;code&gt;StateNew&lt;/code&gt; it is only overriden by the &lt;code&gt;ReadHeaderTimeout&lt;/code&gt; when the server attempts to &lt;a href=&#34;https://github.com/golang/go/blob/release-branch.go1.8/src/net/http/server.go#L915&#34;&gt;read the request&lt;/a&gt;. Thus, the only meaningful activity carried out the Server after setting the custom &lt;code&gt;ReadDeadline&lt;/code&gt; is the TLSHandshake. I&amp;rsquo;ve included the code for this below:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;var TLSHandshakeTimeout = 30 * time.Second // very generous timeout
+
+s := &amp;amp;http.Server{
+  ReadHeaderTimeout: 1 * time.Minute, 
+  ConnState: func(conn net.Conn, cs ConnState){
+    switch cs{
+      case StateNew:
+      conn.SetReadDeadline(time.Now().Add(TLSHandshakeTimeout))
+      default:
+      // NOTE: this is a good place to track connection level metrics :)
+    }
+  }, 
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;resources&#34;&gt;Resources&lt;/h3&gt;
+
+&lt;p&gt;Cloudflare has a great &lt;a href=&#34;https://blog.cloudflare.com/the-complete-guide-to-golang-net-http-timeouts/&#34;&gt;blog post&lt;/a&gt; on timeouts in http that I found very helpful while researching solutions for this problem.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Getting Setup with Ocaml</title>
